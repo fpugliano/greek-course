@@ -22,6 +22,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 <!-- ── Home screen icon (180×180 PNG generated from SVG canvas) ── -->
+     <script src="logo.js"></script>
 <link rel="apple-touch-icon" id="appIcon">
 <link rel="icon" id="favIcon">
 
@@ -217,7 +218,9 @@
 <body>
 
 <div class="app-header">
-  <div class="app-subtitle">Oroboro Greek Language Course</div>
+  <img id="headerLogo" alt="Oroboro" style="height:38px;width:auto;object-fit:contain;filter:brightness(0);">
+  <script>document.getElementById('headerLogo').src=OROBORO_LOGO;</script>
+  <div class="app-subtitle">Greek Language Course</div>
 </div>
 <div class="cat-scroll" id="catNav"></div>
 <div class="lesson-scroll" id="lessonNav"></div>

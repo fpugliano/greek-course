@@ -56,40 +56,47 @@
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, size, size);
 
-    // ── Greek flag: 9 stripes in bottom 55% ──
+   // ── Greek flag: 9 full-size stripes ──
     const blue  = '#0d5eaf';
     const white = '#ffffff';
-    const flagTop = size * 0.45;
-    const flagH   = size - flagTop;
-    const stripeH = flagH / 9;
+    const stripeH = size / 9;
     for (let i = 0; i < 9; i++) {
       ctx.fillStyle = (i % 2 === 0) ? blue : white;
-      ctx.fillRect(0, flagTop + i * stripeH, size, stripeH + 0.5);
+      ctx.fillRect(0, i * stripeH, size, stripeH + 0.5);
     }
-    // Canton in flag area
-    const cantonH = stripeH * 5;
-    const cantonW = cantonH;
-    ctx.fillStyle = blue;
-    ctx.fillRect(0, flagTop, cantonW, cantonH);
-    const crossW = stripeH;
-    ctx.fillStyle = white;
-    ctx.fillRect(0, flagTop + cantonH/2 - crossW/2, cantonW, crossW);
-    ctx.fillRect(cantonW/2 - crossW/2, flagTop, crossW, cantonH);
 
-    // Promise-based: return a Promise that resolves to dataURL
+    // ── Blue canton top-left (5 stripes tall × 5 stripes wide) ──
+    const cantonSize = stripeH * 5;
+    ctx.fillStyle = blue;
+    ctx.fillRect(0, 0, cantonSize, cantonSize);
+
+// ── Oroboro symbol white on blue canton ──
     return new Promise((resolve) => {
       const img = new Image();
       img.onload = () => {
-        // Draw Oroboro logo (just the symbol part) in top 50%, centred
-        const logoSize = size * 0.46;
-        const logoX = (size - logoSize) / 2;
-        const logoY = size * 0.0;
-        // The logo jpg is wide (symbol + text); crop to just the symbol (left ~28% of width)
-        // Source: x=0, y=0, w=img.width*0.28, h=img.height (the circular symbol portion)
         const srcW = img.width * 0.27;
         const srcH = img.height;
-        ctx.drawImage(img, 0, 0, srcW, srcH, logoX, logoY, logoSize, logoSize * (srcH/srcW));
+        const pad = cantonSize * 0.08;
+        const destSize = cantonSize - pad * 2;
+        const destH = destSize * (srcH / srcW);
+        const destY = (cantonSize - destH) / 2;
+        const off = document.createElement('canvas');
+        off.width = off.height = cantonSize;
+        const octx = off.getContext('2d');
+        octx.fillStyle = '#ffffff';
+        octx.fillRect(0, 0, cantonSize, cantonSize);
+        octx.drawImage(img, 0, 0, srcW, srcH, pad, destY, destSize, destH);
+        octx.globalCompositeOperation = 'difference';
+        octx.fillStyle = '#ffffff';
+        octx.fillRect(0, 0, cantonSize, cantonSize);
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        ctx.drawImage(off, 0, 0);
+        ctx.restore();
         resolve(c.toDataURL('image/png'));
+     
+     
+       
       };
       img.onerror = () => resolve(c.toDataURL('image/png')); // fallback: flag only
       img.src = 'data:image/jpeg;base64,' + OROBORO_LOGO_B64;

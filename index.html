@@ -56,47 +56,40 @@
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, size, size);
 
-   // ── Greek flag: 9 full-size stripes ──
+    // ── Greek flag: 9 stripes in bottom 55% ──
     const blue  = '#0d5eaf';
     const white = '#ffffff';
-    const stripeH = size / 9;
+    const flagTop = size * 0.45;
+    const flagH   = size - flagTop;
+    const stripeH = flagH / 9;
     for (let i = 0; i < 9; i++) {
       ctx.fillStyle = (i % 2 === 0) ? blue : white;
-      ctx.fillRect(0, i * stripeH, size, stripeH + 0.5);
+      ctx.fillRect(0, flagTop + i * stripeH, size, stripeH + 0.5);
     }
-
-    // ── Blue canton top-left (5 stripes tall × 5 stripes wide) ──
-    const cantonSize = stripeH * 5;
+    // Canton in flag area
+    const cantonH = stripeH * 5;
+    const cantonW = cantonH;
     ctx.fillStyle = blue;
-    ctx.fillRect(0, 0, cantonSize, cantonSize);
+    ctx.fillRect(0, flagTop, cantonW, cantonH);
+    const crossW = stripeH;
+    ctx.fillStyle = white;
+    ctx.fillRect(0, flagTop + cantonH/2 - crossW/2, cantonW, crossW);
+    ctx.fillRect(cantonW/2 - crossW/2, flagTop, crossW, cantonH);
 
-// ── Oroboro symbol white on blue canton ──
+    // Promise-based: return a Promise that resolves to dataURL
     return new Promise((resolve) => {
       const img = new Image();
       img.onload = () => {
+        // Draw Oroboro logo (just the symbol part) in top 50%, centred
+        const logoSize = size * 0.46;
+        const logoX = (size - logoSize) / 2;
+        const logoY = size * 0.0;
+        // The logo jpg is wide (symbol + text); crop to just the symbol (left ~28% of width)
+        // Source: x=0, y=0, w=img.width*0.28, h=img.height (the circular symbol portion)
         const srcW = img.width * 0.27;
         const srcH = img.height;
-        const pad = cantonSize * 0.08;
-        const destSize = cantonSize - pad * 2;
-        const destH = destSize * (srcH / srcW);
-        const destY = (cantonSize - destH) / 2;
-        const off = document.createElement('canvas');
-        off.width = off.height = cantonSize;
-        const octx = off.getContext('2d');
-        octx.fillStyle = '#ffffff';
-        octx.fillRect(0, 0, cantonSize, cantonSize);
-        octx.drawImage(img, 0, 0, srcW, srcH, pad, destY, destSize, destH);
-        octx.globalCompositeOperation = 'difference';
-        octx.fillStyle = '#ffffff';
-        octx.fillRect(0, 0, cantonSize, cantonSize);
-        ctx.save();
-        ctx.globalCompositeOperation = 'screen';
-        ctx.drawImage(off, 0, 0);
-        ctx.restore();
+        ctx.drawImage(img, 0, 0, srcW, srcH, logoX, logoY, logoSize, logoSize * (srcH/srcW));
         resolve(c.toDataURL('image/png'));
-     
-     
-       
       };
       img.onerror = () => resolve(c.toDataURL('image/png')); // fallback: flag only
       img.src = 'data:image/jpeg;base64,' + OROBORO_LOGO_B64;
@@ -280,6 +273,7 @@ const cats = [
   { name: "Car & Scooter", icon: "🛵" },
   { name: "Filler Words", icon: "💬" },
   { name: "False Friends", icon: "⚠️" },
+  { name: "Sentence Structure", icon: "📖" },
 ];
 
 const lessons = [
@@ -366,8 +360,7 @@ const lessons = [
     { q: "Από πού είσαι;", opts: ["What's your name?","Do you speak English?","Where are you from?","Can you repeat?"], a: "Where are you from?" },
     { q: "Μιλώ λίγο ελληνικά", opts: ["I don't speak Greek","I speak a little Greek","Do you speak Greek?","I understand Greek"], a: "I speak a little Greek" },
   ]
-},
-
+},,
 {
   cat: 0, title: "At a Café", subtitle: "Order drinks like a local",
   phrases: [
@@ -1345,6 +1338,324 @@ const lessons = [
     { q: "γυμνάσιο means...", opts: ["A gym","A stadium","Middle school","A sports club"], a: "Middle school" },
     { q: "καλός means...", opts: ["Callous","Bad","Good / fine","Careful"], a: "Good / fine" },
     { q: "συμπαθητικός means...", opts: ["Sympathetic","Likeable / nice","Sensitive","Serious"], a: "Likeable / nice" },
+  ]
+},
+
+
+// ══════════════════════════════════════
+//  SENTENCE STRUCTURE  cat:15
+// ══════════════════════════════════════
+{
+  cat: 15, title: "How Greek Works", subtitle: "Key grammar patterns explained simply",
+  phrases: [],
+  breakdowns: [
+    {
+      phrase: "Πώς είναι η μητέρα σου;",
+      roman: "Pós íne i mitéra su?",
+      english: "How is your mother?",
+      words: [
+        { greek: "Πώς", roman: "Pós", meaning: "How" },
+        { greek: "είναι", roman: "íne", meaning: "is" },
+        { greek: "η", roman: "i", meaning: "the (feminine article)" },
+        { greek: "μητέρα", roman: "mitéra", meaning: "mother" },
+        { greek: "σου", roman: "su", meaning: "your — ⚠️ comes AFTER the noun" },
+      ]
+    },
+    {
+      phrase: "Δεν καταλαβαίνω",
+      roman: "Den katalavéno",
+      english: "I don't understand",
+      words: [
+        { greek: "Δεν", roman: "den", meaning: "not — negation always comes first" },
+        { greek: "καταλαβαίνω", roman: "katalavéno", meaning: "I understand — subject 'I' is built into the verb" },
+      ]
+    },
+    {
+      phrase: "Μιλώ λίγο ελληνικά",
+      roman: "Miló lígo eliniká",
+      english: "I speak a little Greek",
+      words: [
+        { greek: "Μιλώ", roman: "miló", meaning: "I speak — no need to say 'I' separately" },
+        { greek: "λίγο", roman: "lígo", meaning: "a little" },
+        { greek: "ελληνικά", roman: "eliniká", meaning: "Greek (the language)" },
+      ]
+    },
+    {
+      phrase: "Θέλω έναν καφέ παρακαλώ",
+      roman: "Thélo énan kafé parakaló",
+      english: "I want a coffee please",
+      words: [
+        { greek: "Θέλω", roman: "thélo", meaning: "I want — subject built into verb" },
+        { greek: "έναν", roman: "énan", meaning: "a / one — masculine accusative article" },
+        { greek: "καφέ", roman: "kafé", meaning: "coffee — changes ending in accusative" },
+        { greek: "παρακαλώ", roman: "parakaló", meaning: "please — always goes at the end" },
+      ]
+    },
+    {
+      phrase: "Πού είναι το φαρμακείο;",
+      roman: "Pu íne to farmakío?",
+      english: "Where is the pharmacy?",
+      words: [
+        { greek: "Πού", roman: "pu", meaning: "where" },
+        { greek: "είναι", roman: "íne", meaning: "is" },
+        { greek: "το", roman: "to", meaning: "the — neuter article (το for neuter nouns)" },
+        { greek: "φαρμακείο", roman: "farmakío", meaning: "pharmacy" },
+      ]
+    },
+    {
+      phrase: "Έχω χαθεί",
+      roman: "Ého hathí",
+      english: "I am lost",
+      words: [
+        { greek: "Έχω", roman: "ého", meaning: "I have — used to form perfect tenses" },
+        { greek: "χαθεί", roman: "hathí", meaning: "been lost — past participle of χάνομαι" },
+      ]
+    },
+  ],
+  tip: "The three golden rules of Greek sentence structure: <strong>1)</strong> The subject pronoun is usually omitted — it lives inside the verb ending. <strong>2)</strong> Possessives come AFTER the noun (η μητέρα σου = the mother your). <strong>3)</strong> Negation always comes before the verb — just add <strong>Δεν</strong> in front of anything to make it negative.",
+},
+{
+  cat: 15, title: "20 Essential Sentences", subtitle: "The most common phrases taken apart word by word",
+  phrases: [],
+  breakdowns: [
+    {
+      phrase: "Καλημέρα, πώς είσαι;",
+      roman: "Kali-méra, pós íse?",
+      english: "Good morning, how are you?",
+      words: [
+        { greek: "Καλημέρα", roman: "kalimera", meaning: "good morning — καλή (good) + μέρα (day)" },
+        { greek: "πώς", roman: "pós", meaning: "how" },
+        { greek: "είσαι", roman: "íse", meaning: "you are — 2nd person singular of 'to be'" },
+      ]
+    },
+    {
+      phrase: "Με λένε Φραντσέσκο",
+      roman: "Me léne Françesko",
+      english: "My name is Francesco",
+      words: [
+        { greek: "Με", roman: "me", meaning: "me — direct object pronoun" },
+        { greek: "λένε", roman: "léne", meaning: "they call — 3rd person plural" },
+        { greek: "Φραντσέσκο", roman: "Françesko", meaning: "Francesco — the name" },
+      ]
+    },
+    {
+      phrase: "Είμαι από την Ιταλία",
+      roman: "Íme apó tin Italía",
+      english: "I am from Italy",
+      words: [
+        { greek: "Είμαι", roman: "íme", meaning: "I am — subject built in" },
+        { greek: "από", roman: "apó", meaning: "from" },
+        { greek: "την", roman: "tin", meaning: "the — feminine accusative article after από" },
+        { greek: "Ιταλία", roman: "Italía", meaning: "Italy" },
+      ]
+    },
+    {
+      phrase: "Πόσο κάνει αυτό;",
+      roman: "Póso káni aftó?",
+      english: "How much does this cost?",
+      words: [
+        { greek: "Πόσο", roman: "póso", meaning: "how much" },
+        { greek: "κάνει", roman: "káni", meaning: "does it cost — literally 'does it make'" },
+        { greek: "αυτό", roman: "aftó", meaning: "this — neuter demonstrative pronoun" },
+      ]
+    },
+    {
+      phrase: "Θέλω να πάω στο λιμάνι",
+      roman: "Thélo na páo sto limáni",
+      english: "I want to go to the harbour",
+      words: [
+        { greek: "Θέλω", roman: "thélo", meaning: "I want" },
+        { greek: "να", roman: "na", meaning: "to — connects two verbs, like English infinitive" },
+        { greek: "πάω", roman: "páo", meaning: "I go — Greek uses present tense after να" },
+        { greek: "στο", roman: "sto", meaning: "to the — σε (to) + το (the) merged" },
+        { greek: "λιμάνι", roman: "limáni", meaning: "harbour" },
+      ]
+    },
+    {
+      phrase: "Μπορείς να μιλάς πιο αργά;",
+      roman: "Borís na milás pio argá?",
+      english: "Can you speak more slowly?",
+      words: [
+        { greek: "Μπορείς", roman: "borís", meaning: "can you — 2nd person of μπορώ (I can)" },
+        { greek: "να", roman: "na", meaning: "to — links the two verbs" },
+        { greek: "μιλάς", roman: "milás", meaning: "you speak" },
+        { greek: "πιο", roman: "pio", meaning: "more — used before adjectives/adverbs" },
+        { greek: "αργά", roman: "argá", meaning: "slowly" },
+      ]
+    },
+    {
+      phrase: "Έχετε δωμάτιο για δύο άτομα;",
+      roman: "Éhete domátio ya dío átoma?",
+      english: "Do you have a room for two people?",
+      words: [
+        { greek: "Έχετε", roman: "éhete", meaning: "do you have — formal/plural of έχω" },
+        { greek: "δωμάτιο", roman: "domátio", meaning: "room" },
+        { greek: "για", roman: "ya", meaning: "for" },
+        { greek: "δύο", roman: "dío", meaning: "two" },
+        { greek: "άτομα", roman: "átoma", meaning: "people — plural of άτομο" },
+      ]
+    },
+    {
+      phrase: "Πότε φεύγει το πλοίο;",
+      roman: "Póte févgi to plío?",
+      english: "When does the boat leave?",
+      words: [
+        { greek: "Πότε", roman: "póte", meaning: "when" },
+        { greek: "φεύγει", roman: "févgi", meaning: "leaves / departs — 3rd person singular" },
+        { greek: "το", roman: "to", meaning: "the — neuter article" },
+        { greek: "πλοίο", roman: "plío", meaning: "boat / ship" },
+      ]
+    },
+    {
+      phrase: "Δεν μιλώ καλά ελληνικά",
+      roman: "Den miló kalá eliniká",
+      english: "I don't speak Greek well",
+      words: [
+        { greek: "Δεν", roman: "den", meaning: "not — negation particle, always first" },
+        { greek: "μιλώ", roman: "miló", meaning: "I speak" },
+        { greek: "καλά", roman: "kalá", meaning: "well / good — adverb" },
+        { greek: "ελληνικά", roman: "eliniká", meaning: "Greek (language)" },
+      ]
+    },
+    {
+      phrase: "Το φαγητό ήταν πολύ νόστιμο",
+      roman: "To fayitó ítan polí nóstimo",
+      english: "The food was very delicious",
+      words: [
+        { greek: "Το", roman: "to", meaning: "the — neuter article" },
+        { greek: "φαγητό", roman: "fayitó", meaning: "food" },
+        { greek: "ήταν", roman: "ítan", meaning: "was — past tense of είναι (is)" },
+        { greek: "πολύ", roman: "polí", meaning: "very" },
+        { greek: "νόστιμο", roman: "nóstimo", meaning: "delicious — agrees with neuter noun" },
+      ]
+    },
+    {
+      phrase: "Πρέπει να φύγουμε τώρα",
+      roman: "Prépi na fígume tóra",
+      english: "We need to leave now",
+      words: [
+        { greek: "Πρέπει", roman: "prépi", meaning: "it is necessary / must — impersonal verb" },
+        { greek: "να", roman: "na", meaning: "to — subjunctive connector" },
+        { greek: "φύγουμε", roman: "fígume", meaning: "we leave — 1st person plural" },
+        { greek: "τώρα", roman: "tóra", meaning: "now" },
+      ]
+    },
+    {
+      phrase: "Η θάλασσα είναι πολύ όμορφη σήμερα",
+      roman: "I thálasa íne polí ómorfi símera",
+      english: "The sea is very beautiful today",
+      words: [
+        { greek: "Η", roman: "i", meaning: "the — feminine article" },
+        { greek: "θάλασσα", roman: "thálasa", meaning: "sea — feminine noun" },
+        { greek: "είναι", roman: "íne", meaning: "is" },
+        { greek: "πολύ", roman: "polí", meaning: "very" },
+        { greek: "όμορφη", roman: "ómorfi", meaning: "beautiful — feminine form, agrees with θάλασσα" },
+        { greek: "σήμερα", roman: "símera", meaning: "today" },
+      ]
+    },
+    {
+      phrase: "Πού μπορώ να βρω ένα ταξί;",
+      roman: "Pu boró na vro éna taxí?",
+      english: "Where can I find a taxi?",
+      words: [
+        { greek: "Πού", roman: "pu", meaning: "where" },
+        { greek: "μπορώ", roman: "boró", meaning: "can I — 1st person of μπορώ" },
+        { greek: "να", roman: "na", meaning: "to — subjunctive connector" },
+        { greek: "βρω", roman: "vro", meaning: "find — subjunctive of βρίσκω" },
+        { greek: "ένα", roman: "éna", meaning: "a / one — neuter indefinite article" },
+        { greek: "ταξί", roman: "taxí", meaning: "taxi — indeclinable (never changes form)" },
+      ]
+    },
+    {
+      phrase: "Αγαπώ την Ελλάδα πολύ",
+      roman: "Agapó tin Eláða polí",
+      english: "I love Greece very much",
+      words: [
+        { greek: "Αγαπώ", roman: "agapó", meaning: "I love — subject built into verb" },
+        { greek: "την", roman: "tin", meaning: "the — feminine accusative (direct object)" },
+        { greek: "Ελλάδα", roman: "Eláða", meaning: "Greece — accusative form of Ελλάδα" },
+        { greek: "πολύ", roman: "polí", meaning: "very much — goes at the end" },
+      ]
+    },
+    {
+      phrase: "Χρειάζομαι βοήθεια παρακαλώ",
+      roman: "Hriaázome voíthia parakaló",
+      english: "I need help please",
+      words: [
+        { greek: "Χρειάζομαι", roman: "hriaázome", meaning: "I need — deponent verb (passive form, active meaning)" },
+        { greek: "βοήθεια", roman: "voíthia", meaning: "help / assistance" },
+        { greek: "παρακαλώ", roman: "parakaló", meaning: "please — always at the end of the sentence" },
+      ]
+    },
+    {
+      phrase: "Πόσο καιρό μένεις στην Ελλάδα;",
+      roman: "Póso keró ménis stin Eláða?",
+      english: "How long have you been in Greece?",
+      words: [
+        { greek: "Πόσο", roman: "póso", meaning: "how much / how long" },
+        { greek: "καιρό", roman: "keró", meaning: "time — accusative of καιρός" },
+        { greek: "μένεις", roman: "ménis", meaning: "are you staying / do you live — 2nd person" },
+        { greek: "στην", roman: "stin", meaning: "in the — σε (in) + την (the feminine)" },
+        { greek: "Ελλάδα", roman: "Eláða", meaning: "Greece — accusative after στην" },
+      ]
+    },
+    {
+      phrase: "Ο άνεμος είναι δυνατός σήμερα",
+      roman: "O ánemos íne ðinatós símera",
+      english: "The wind is strong today",
+      words: [
+        { greek: "Ο", roman: "o", meaning: "the — masculine article" },
+        { greek: "άνεμος", roman: "ánemos", meaning: "wind — masculine noun" },
+        { greek: "είναι", roman: "íne", meaning: "is" },
+        { greek: "δυνατός", roman: "ðinatós", meaning: "strong — masculine form, agrees with ο άνεμος" },
+        { greek: "σήμερα", roman: "símera", meaning: "today" },
+      ]
+    },
+    {
+      phrase: "Μπορείτε να μου φέρετε τον λογαριασμό;",
+      roman: "Boríte na mu férete ton logariazmó?",
+      english: "Can you bring me the bill?",
+      words: [
+        { greek: "Μπορείτε", roman: "boríte", meaning: "can you — formal/plural of μπορώ" },
+        { greek: "να", roman: "na", meaning: "to — subjunctive connector" },
+        { greek: "μου", roman: "mu", meaning: "me — indirect object pronoun (to me)" },
+        { greek: "φέρετε", roman: "férete", meaning: "bring — 2nd person plural subjunctive" },
+        { greek: "τον", roman: "ton", meaning: "the — masculine accusative article" },
+        { greek: "λογαριασμό", roman: "logariazmó", english: "bill — accusative (direct object)" },
+      ]
+    },
+    {
+      phrase: "Είναι η πρώτη φορά μου στην Ελλάδα",
+      roman: "Íne i próti forá mu stin Eláða",
+      english: "It is my first time in Greece",
+      words: [
+        { greek: "Είναι", roman: "íne", meaning: "it is" },
+        { greek: "η", roman: "i", meaning: "the — feminine article" },
+        { greek: "πρώτη", roman: "próti", meaning: "first — feminine, agrees with φορά" },
+        { greek: "φορά", roman: "forá", meaning: "time / occasion — feminine noun" },
+        { greek: "μου", roman: "mu", meaning: "my — possessive, comes after noun" },
+        { greek: "στην", roman: "stin", meaning: "in the — σε + την merged" },
+        { greek: "Ελλάδα", roman: "Eláða", meaning: "Greece" },
+      ]
+    },
+    {
+      phrase: "Θα επιστρέψω σίγουρα του χρόνου",
+      roman: "Tha epistréfso síγura tu hrónu",
+      english: "I will definitely come back next year",
+      words: [
+        { greek: "Θα", roman: "tha", meaning: "will — future particle, always before the verb" },
+        { greek: "επιστρέψω", roman: "epistréfso", meaning: "I return / come back — future stem" },
+        { greek: "σίγουρα", roman: "síγura", meaning: "definitely / certainly" },
+        { greek: "του χρόνου", roman: "tu hrónu", meaning: "next year — literally 'of the year'" },
+      ]
+    },
+  ],
+  tip: "Notice three patterns repeating constantly: <strong>να + verb</strong> works like the English infinitive ('to do') · <strong>Θα + verb</strong> makes any sentence future tense · <strong>Δεν + verb</strong> makes any sentence negative. Master these three and you can build hundreds of sentences.",
+  quiz: [
+    { q: "Θα + verb means...", opts: ["past tense","negative","future tense","a question"], a: "future tense" },
+    { q: "Δεν + verb means...", opts: ["I want to...","I can...","negation — not","I must..."], a: "negation — not" },
+    { q: "In 'η μητέρα σου', where does 'your' go?", opts: ["before the noun","after the article","after the noun","before the verb"], a: "after the noun" },
+    { q: "Να connects...", opts: ["two nouns","two sentences","two verbs like 'to'","a noun and adjective"], a: "two verbs like 'to'" },
   ]
 },
 

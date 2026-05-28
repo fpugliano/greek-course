@@ -1179,14 +1179,7 @@ buildLessonNav(0);
 // Pre-load voices for fallback
 window.speechSynthesis && (window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices());
 
-// Show notice if Worker not yet configured
-if (!TTS_WORKER_URL || TTS_WORKER_URL === 'YOUR_WORKER_URL_HERE') {
-  const notice = document.getElementById('ttsNotice');
-  if (notice) {
-    notice.style.cssText += ';background:rgba(255,149,0,0.12);border-left:4px solid var(--orange);border-radius:12px;color:var(--label2)';
-    notice.innerHTML = '⚠️ Using device voice. Follow the Setup Guide to enable natural Greek pronunciation.';
-  }
-}
+
 </script>
 </body>
 </html>

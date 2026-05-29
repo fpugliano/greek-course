@@ -240,6 +240,7 @@ const cats = [
   { name: "Ice Breakers", icon: "😄" },
   { name: "Sentence Structure", icon: "📖" },
   { name: "Grammar", icon: "📝" },
+  { name: "Numbers & Time", icon: "🔢" },
 ];
 
 const lessons = [
@@ -1198,6 +1199,141 @@ const lessons = [
     { q: "η μητέρα σου means...", opts: ["my mother","his mother","your mother","our mother"], a: "your mother" },
   ]
 },
+
+// ══════════════════════════════════════
+//  NUMBERS & TIME  cat:9
+// ══════════════════════════════════════
+{
+  cat: 9, title: "Numbers 0–100", subtitle: "Count, pay, and tell quantities",
+  vocabGroups: [
+    {
+      title: "0 to 10",
+      items: [
+        { greek: "μηδέν",   roman: "midén",   english: "0 — zero"  },
+        { greek: "ένα",     roman: "éna",     english: "1 — one"   },
+        { greek: "δύο",     roman: "dío",     english: "2 — two"   },
+        { greek: "τρία",    roman: "tría",    english: "3 — three" },
+        { greek: "τέσσερα", roman: "tésera",  english: "4 — four"  },
+        { greek: "πέντε",   roman: "pénde",   english: "5 — five"  },
+        { greek: "έξι",     roman: "éxi",     english: "6 — six"   },
+        { greek: "επτά",    roman: "eptá",    english: "7 — seven" },
+        { greek: "οκτώ",    roman: "októ",    english: "8 — eight" },
+        { greek: "εννέα",   roman: "enéa",    english: "9 — nine"  },
+        { greek: "δέκα",    roman: "déka",    english: "10 — ten"  },
+      ]
+    },
+    {
+      title: "11 to 20",
+      items: [
+        { greek: "έντεκα",      roman: "éndeka",     english: "11 — eleven"    },
+        { greek: "δώδεκα",      roman: "dódeka",     english: "12 — twelve"    },
+        { greek: "δεκατρία",    roman: "dekatría",   english: "13 — thirteen"  },
+        { greek: "δεκατέσσερα", roman: "dekatésera", english: "14 — fourteen"  },
+        { greek: "δεκαπέντε",   roman: "dekapénde",  english: "15 — fifteen"   },
+        { greek: "δεκαέξι",     roman: "dekaéxi",    english: "16 — sixteen"   },
+        { greek: "δεκαεπτά",    roman: "dekaeptá",   english: "17 — seventeen" },
+        { greek: "δεκαοκτώ",    roman: "dekaoktó",   english: "18 — eighteen"  },
+        { greek: "δεκαεννέα",   roman: "dekaenéa",   english: "19 — nineteen"  },
+        { greek: "είκοσι",      roman: "íkosi",      english: "20 — twenty"    },
+      ]
+    },
+    {
+      title: "Tens, 100 and beyond",
+      items: [
+        { greek: "τριάντα",         roman: "triánda",        english: "30 — thirty"        },
+        { greek: "σαράντα",         roman: "saránda",        english: "40 — forty"         },
+        { greek: "πενήντα",         roman: "penínda",        english: "50 — fifty"         },
+        { greek: "εξήντα",          roman: "exínda",         english: "60 — sixty"         },
+        { greek: "εβδομήντα",       roman: "evdomínda",      english: "70 — seventy"       },
+        { greek: "ογδόντα",         roman: "ogdónda",        english: "80 — eighty"        },
+        { greek: "ενενήντα",        roman: "enenínda",       english: "90 — ninety"        },
+        { greek: "εκατό",           roman: "ekató",          english: "100 — one hundred"  },
+        { greek: "χίλια",           roman: "hília",          english: "1,000 — one thousand"   },
+        { greek: "ένα εκατομμύριο", roman: "éna ekatomirio", english: "1,000,000 — one million" },
+      ]
+    },
+  ],
+  tip: "To combine numbers above 20, say the tens then the unit: <strong>είκοσι ένα</strong> (21) · <strong>τριάντα πέντε</strong> (35) · <strong>εξήντα δύο</strong> (62). For prices, say the number then <strong>ευρώ</strong> (evró): <strong>πέντε ευρώ</strong> = €5.",
+  quiz: [
+    { q: "δύο",     opts: ["1","2","3","4"],         a: "2"  },
+    { q: "δέκα",    opts: ["5","8","10","12"],        a: "10" },
+    { q: "είκοσι",  opts: ["12","15","20","30"],      a: "20" },
+    { q: "πενήντα", opts: ["30","40","50","60"],      a: "50" },
+  ]
+},
+{
+  cat: 9, title: "Days, Months & Dates", subtitle: "Navigate the calendar with confidence",
+  phrases: [
+    { greek: "Σήμερα",                         roman: "Símera",                   english: "Today"                 },
+    { greek: "Αύριο",                          roman: "Ávrio",                    english: "Tomorrow"              },
+    { greek: "Χθες",                           roman: "Hthes",                    english: "Yesterday"             },
+    { greek: "Την επόμενη εβδομάδα",           roman: "Tin epómeni evdomáda",     english: "Next week"             },
+    { greek: "Τι ημερομηνία έχουμε σήμερα;",  roman: "Ti imerominía éhume símera?", english: "What is today's date?" },
+    { greek: "Πότε;",                          roman: "Póte?",                    english: "When?"                 },
+  ],
+  vocabGroups: [
+    {
+      title: "Days of the week — Ημέρες της εβδομάδας",
+      items: [
+        { greek: "Δευτέρα",   roman: "Deftéra",   english: "Monday"    },
+        { greek: "Τρίτη",     roman: "Tríti",     english: "Tuesday"   },
+        { greek: "Τετάρτη",   roman: "Tetárti",   english: "Wednesday" },
+        { greek: "Πέμπτη",    roman: "Pémpti",    english: "Thursday"  },
+        { greek: "Παρασκευή", roman: "Paraskevi", english: "Friday"    },
+        { greek: "Σάββατο",   roman: "Sávato",    english: "Saturday"  },
+        { greek: "Κυριακή",   roman: "Kiriakí",   english: "Sunday"    },
+      ]
+    },
+    {
+      title: "Months of the year — Μήνες του χρόνου",
+      items: [
+        { greek: "Ιανουάριος",  roman: "Ianouários",  english: "January"   },
+        { greek: "Φεβρουάριος", roman: "Fevrouários", english: "February"  },
+        { greek: "Μάρτιος",     roman: "Mártios",     english: "March"     },
+        { greek: "Απρίλιος",    roman: "Aprílios",    english: "April"     },
+        { greek: "Μάιος",       roman: "Máios",       english: "May"       },
+        { greek: "Ιούνιος",     roman: "Ioúnios",     english: "June"      },
+        { greek: "Ιούλιος",     roman: "Ioúlios",     english: "July"      },
+        { greek: "Αύγουστος",   roman: "Ávgoustos",   english: "August"    },
+        { greek: "Σεπτέμβριος", roman: "Septévrios",  english: "September" },
+        { greek: "Οκτώβριος",   roman: "Októvrios",   english: "October"   },
+        { greek: "Νοέμβριος",   roman: "Noévrios",    english: "November"  },
+        { greek: "Δεκέμβριος",  roman: "Dekévrios",   english: "December"  },
+      ]
+    },
+  ],
+  tip: "Greek day names tell a story: <strong>Δευτέρα</strong> = second day · <strong>Τρίτη</strong> = third · <strong>Τετάρτη</strong> = fourth · <strong>Πέμπτη</strong> = fifth · <strong>Παρασκευή</strong> = day of preparation (before the Sabbath) · <strong>Σάββατο</strong> = the Sabbath · <strong>Κυριακή</strong> = the Lord's day (Κύριος = Lord).",
+  quiz: [
+    { q: "Δευτέρα",   opts: ["Sunday","Monday","Tuesday","Wednesday"],    a: "Monday"   },
+    { q: "Παρασκευή", opts: ["Thursday","Friday","Saturday","Sunday"],    a: "Friday"   },
+    { q: "Αύριο",     opts: ["Today","Yesterday","Tomorrow","Next week"], a: "Tomorrow" },
+    { q: "Ιούνιος",   opts: ["April","May","June","July"],                a: "June"     },
+  ]
+},
+{
+  cat: 9, title: "Telling the Time", subtitle: "Ask and understand what time it is",
+  phrases: [
+    { greek: "Τι ώρα είναι;",        roman: "Ti óra íne?",         english: "What time is it?"    },
+    { greek: "Είναι δύο η ώρα",      roman: "Íne dío i óra",       english: "It is two o'clock"   },
+    { greek: "Μία και μισή",         roman: "Mía ke misí",         english: "Half past one"       },
+    { greek: "Τέσσερις και τέταρτο", roman: "Tésseris ke tétarto", english: "Quarter past four"   },
+    { greek: "Το πρωί",              roman: "To proí",             english: "In the morning"      },
+    { greek: "Το απόγευμα",          roman: "To apóyevma",         english: "In the afternoon"    },
+    { greek: "Το βράδυ",             roman: "To vrádi",            english: "In the evening"      },
+    { greek: "Μεσάνυχτα",           roman: "Mesánihta",           english: "Midnight"            },
+    { greek: "Μεσημέρι",            roman: "Mesiméri",            english: "Midday / Noon"       },
+    { greek: "Πότε ανοίγει;",       roman: "Póte aníyi?",         english: "When does it open?"  },
+    { greek: "Πότε κλείνει;",       roman: "Póte klíni?",         english: "When does it close?" },
+  ],
+  tip: "Greece runs on Mediterranean time — the afternoon <strong>μεσημέρι</strong> break (roughly 2–5pm) is sacred in smaller towns and islands. Many shops close, noise is frowned upon, and locals nap. Dinner rarely starts before 9pm. If you ask <strong>Πότε ανοίγει;</strong> the answer is often <strong>μετά τις πέντε</strong> (after five).",
+  quiz: [
+    { q: "Τι ώρα είναι;", opts: ["What day is it?","What time is it?","When does it open?","How long?"], a: "What time is it?"    },
+    { q: "Μεσάνυχτα",     opts: ["Midday","Midnight","Morning","Evening"],                               a: "Midnight"           },
+    { q: "Πότε ανοίγει;", opts: ["When does it close?","When does it open?","Is it open?","What time?"], a: "When does it open?" },
+    { q: "Το πρωί",       opts: ["In the evening","At midnight","In the morning","In the afternoon"],    a: "In the morning"     },
+  ]
+},
+
 ]; // end lessons
 
 // ─── Build UI ──────────────────────────────────────────────

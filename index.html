@@ -181,7 +181,7 @@
 
   .field-ref { background: var(--surface); border-radius: var(--card-radius); overflow: hidden; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
   .field-ref-header { background: var(--surface2); padding: 10px 16px; font-size: 13px; font-weight: 700; color: var(--label3); text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid var(--separator); }
-  .field-row { display: flex; padding: 11px 16px; border-bottom: 1px solid var(--separator); align-items: flex-start; gap: 12px; }
+  .field-row { display: flex; padding: 11px 16px; border-bottom: 1px solid var(--separator); align-items: center; gap: 12px; }
   .field-row:last-child { border-bottom: none; }
   .field-label-en { font-size: 13px; color: var(--label3); width: 120px; flex-shrink: 0; padding-top: 2px; }
   .field-label-gr { font-size: 17px; font-weight: 600; color: var(--label); }
@@ -535,7 +535,7 @@ const lessons = [
     { greek: "Χρειαζόμαστε ρυμούλκηση", roman: "Hriaazómaste rimúlkisi", english: "We need a tow" },
     { greek: "Το όνομα του σκάφους", roman: "To ónoma tu skáfus", english: "The name of the vessel" },
   ],
-  tip: "Coast Guard emergency: <strong>108</strong>. Remember that the Coast Guard in Greece is not there to help and protect you like the US Coast Guard. If you ever run into troubles, calling the Coast Guard on Channel 16 should be your very last option. You don't want your boat to be impounded.",
+  tip: "Remember that the Coast Guard in Greece is not there to help and protect you like the US Coast Guard. If you ever run into troubles, calling the Coast Guard on Channel 16 should be your very last option. You don't want your boat to be impounded.",
   quiz: [
     { q: "Άνθρωπος στη θάλασσα!", opts: ["Fire on board","Man overboard!","We are sinking","We need a tow"], a: "Man overboard!" },
     { q: "Χρειαζόμαστε βοήθεια", opts: ["We need a tow","We need assistance","Our position is","How many on board?"], a: "We need assistance" },
@@ -1544,7 +1544,7 @@ function mkFormRef(fr) {
   wrap.appendChild(lbl);
   const card = document.createElement('div'); card.className = 'field-ref';
   card.innerHTML = `<div class="field-ref-header">${fr.title}</div>` +
-    fr.fields.map(f=>`<div class="field-row"><div class="field-label-en">${f.en}</div><div><div class="field-label-gr">${f.greek}</div><div class="field-roman">${f.roman}</div></div></div>`).join('');
+    fr.fields.map(f=>`<div class="field-row"><div class="field-label-en">${f.en}</div><div style="flex:1"><div class="field-label-gr">${f.greek}</div><div class="field-roman">${f.roman}</div></div><button class="speak-btn speak-btn-sm" onclick="speak('${safe(f.greek)}',this)">🔊</button></div>`).join('');
   wrap.appendChild(card);
   return wrap;
 }

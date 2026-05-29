@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ══ PWA / Home Screen settings ══════════════════════════
+     ICON:  The icon is an SVG drawn below and converted to
+            a data URL. Change the emoji or colours to customise.
+     NAME:  Change "Καλημέρα" in the two apple-mobile lines
+            and in the <title> to rename the home screen icon.
+═══════════════════════════════════════════════════════════ -->
+<title>Greek for Sailors</title>
+
+<!-- Shown below the icon on the home screen -->
+<meta name="apple-mobile-web-app-title" content="Greek for Sailors">
+<meta name="application-name" content="Greek for Sailors">
+
+<!-- Makes it open full-screen (no Safari chrome) -->
+<meta name="-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<!-- ── Home screen icon (180×180 PNG generated from SVG canvas) ── -->
+     <script src="logo.js"></script>
+<link rel="apple-touch-icon" id="appIcon">
+<link rel="icon" id="favIcon">
+
+<script>
+// Generate the app icon as a canvas PNG and inject it.
+// Edit the drawIcon() function below to customise the design.
+(function() {
+  function drawIcon(size) {
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const ctx = c.getContext('2d');
+    const r = size * 0.18; // rounded corners for iOS icon shape
+
+    // Clip to rounded rectangle
+    ctx.beginPath();
+    ctx.moveTo(r, 0);
+    ctx.lineTo(size - r, 0);
+    ctx.quadraticCurveTo(size, 0, size, r);
+    ctx.lineTo(size, size - r);
+    ctx.quadraticCurveTo(size, size, size - r, size);
+    ctx.lineTo(r, size);
+    ctx.quadraticCurveTo(0, size, 0, size - r);
+    ctx.lineTo(0, r);
+    ctx.quadraticCurveTo(0, 0, r, 0);
+    ctx.closePath();
+    ctx.clip();
+
+    // ── Greek flag: 9 equal horizontal stripes, blue/white alternating ──
+    const blue  = '#0d5eaf';
+    const white = '#ffffff';
+    const stripeH = size / 9;
+    for (let i = 0; i < 9; i++) {
+      ctx.fillStyle = (i % 2 === 0) ? blue : white;
+      ctx.fillRect(0, i * stripeH, size, stripeH + 0.5); // +0.5 avoids sub-pixel gaps
+    }
+
+    // ── Canton (top-left blue square) — 5 stripes tall × 5 stripes wide ──
+    const cantonSize = stripeH * 5;
+    ctx.fillStyle = blue;
+    ctx.fillRect(0, 0, cantonSize, cantonSize);
+
+    // ── Oroboro symbol white on blue canton ──
+    // Uses OROBORO_LOGO from logo.js — returns a Promise
+    return new Promise((resolve) => {
+      if (typeof OROBORO_LOGO === 'undefined') {
+        // fallback: draw white cross if logo not loaded
+        const cw = stripeH;
+        ctx.fillStyle = white;
+        ctx.fillRect(0, cantonSize/2 - cw/2, cantonSize, cw);
+        ctx.fillRect(cantonSize/2 - cw/2, 0, cw, cantonSize);
+        resolve(c.toDataURL('image/png'));
+        return;
+      }
+      const img = new Image();
+      img.onload = () => {
+        // Crop just the circular symbol (left 27% of the logo image)
+        const srcW = img.width * 0.27;
+        const srcH = img.height;
+        const pad = cantonSize * 0.08;
+        const destSize = cantonSize - pad * 2;
+        const destH = destSize * (srcH / srcW);
+        const destY = (cantonSize - destH) / 2;
+        // Draw on offscreen canvas, invert to white, then screen-blend onto blue canton
+        const off = document.createElement('canvas');
+        off.width = off.height = cantonSize;
+        const octx = off.getContext('2d');
+        octx.fillStyle = white;
+        octx.fillRect(0, 0, cantonSize, cantonSize);
+        octx.drawImage(img, 0, 0, srcW, srcH, pad, destY, destSize, destH);
+        octx.globalCompositeOperation = 'difference';
+        octx.fillStyle = white;
+        octx.fillRect(0, 0, cantonSize, cantonSize);
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen';
+        ctx.drawImage(off, 0, 0);
+        ctx.restore();
+        resolve(c.toDataURL('image/png'));
+      };
+      img.onerror = () => {
+        // fallback cross
+        const cw = stripeH;
+        ctx.fillStyle = white;
+        ctx.fillRect(0, cantonSize/2 - cw/2, cantonSize, cw);
+        ctx.fillRect(cantonSize/2 - cw/2, 0, cw, cantonSize);
+        resolve(c.toDataURL('image/png'));
+      };
+      img.src = OROBORO_LOGO;
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const result = drawIcon(180);
+    const apply = (iconData) => {
+      const el = document.getElementById('appIcon');
+      const fav = document.getElementById('favIcon');
+      if (el) el.href = iconData;
+      if (fav) { fav.href = iconData; fav.type = 'image/png'; }
+    };
+    if (result && typeof result.then === 'function') {
+      result.then(apply);
+    } else {
+      apply(result);
+    }
+  });
+})();
+</script>
+<style>
+  :root {
+    --bg: #f2f2f7;
+    --surface: #ffffff;
+    --surface2: #f2f2f7;
+    --blue: #007aff;
+    --blue-dark: #0051a8;
+    --label: #000000;
+    --label2: #3c3c43cc;
+    --label3: #3c3c4399;
+    --separator: #c6c6c8;
+    --green: #34c759;
+    --red: #ff3b30;
+    --orange: #ff9500;
+    --grouped-bg: #f2f2f7;
+    --card-radius: 12px;
+    --font: -apple-system, 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #000000; --surface: #1c1c1e; --surface2: #2c2c2e;
+      --label: #ffffff; --label2: #ebebf5cc; --label3: #ebebf599;
+      --separator: #38383a; --grouped-bg: #000000;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: var(--font); background: var(--grouped-bg); color: var(--label); min-height: 100vh; font-size: 17px; }
+
+  .app-header { background: var(--surface); border-bottom: 1px solid var(--separator); padding: 16px 20px 12px; position: sticky; top: 0; z-index: 100; }
+  .app-title { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; color: var(--label); }
+  .app-subtitle { font-size: 13px; color: var(--label3); margin-top: 2px; }
+
+  .cat-scroll { background: var(--surface); border-bottom: 1px solid var(--separator); overflow-x: auto; display: flex; scrollbar-width: none; padding: 0 12px; }
+  .cat-scroll::-webkit-scrollbar { display: none; }
+  .cat-btn { flex-shrink: 0; border: none; background: none; font-family: var(--font); font-size: 15px; font-weight: 500; color: var(--label3); padding: 10px 14px; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: color 0.15s; }
+  .cat-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
+
+  .lesson-scroll { background: var(--surface2); border-bottom: 1px solid var(--separator); overflow-x: auto; display: flex; gap: 8px; padding: 10px 16px; scrollbar-width: none; }
+  .lesson-scroll::-webkit-scrollbar { display: none; }
+  .lesson-pill { flex-shrink: 0; border: 1px solid var(--separator); background: var(--surface); font-family: var(--font); font-size: 14px; font-weight: 500; color: var(--label2); padding: 7px 14px; border-radius: 20px; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+  .lesson-pill.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+  main { padding: 16px 16px 80px; max-width: 680px; margin: 0 auto; }
+  .lesson { display: none; }
+  .lesson.active { display: block; }
+
+  .lesson-hd { margin-bottom: 20px; }
+  .lesson-cat-tag { font-size: 13px; font-weight: 600; color: var(--blue); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .lesson-title { font-size: 26px; font-weight: 700; letter-spacing: -0.3px; color: var(--label); }
+  .lesson-sub { font-size: 15px; color: var(--label3); margin-top: 3px; }
+
+  .section-hd { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: var(--label3); margin: 24px 4px 8px; }
+
+  /* Vocab group */
+  .vocab-group { background: var(--surface); border-radius: var(--card-radius); overflow: hidden; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .vocab-group-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--blue); padding: 10px 16px 6px; border-bottom: 1px solid var(--separator); background: rgba(0,122,255,0.04); }
+  .vocab-item { display: flex; align-items: center; gap: 12px; padding: 11px 16px; border-bottom: 1px solid var(--separator); }
+  .vocab-item:last-child { border-bottom: none; }
+  .vocab-body { flex: 1; }
+  .vocab-greek { font-size: 19px; font-weight: 600; color: var(--label); }
+  .vocab-roman { font-size: 13px; color: var(--blue); font-style: italic; margin-top: 2px; }
+  .vocab-english { font-size: 14px; color: var(--label2); margin-top: 2px; }
+
+  .phrase-card { background: var(--surface); border-radius: var(--card-radius); padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .phrase-body { flex: 1; min-width: 0; }
+  .phrase-greek { font-size: 22px; font-weight: 600; color: var(--label); letter-spacing: -0.2px; line-height: 1.25; }
+  .phrase-roman { font-size: 14px; color: var(--blue); margin-top: 3px; font-style: italic; }
+  .phrase-english { font-size: 15px; color: var(--label2); margin-top: 4px; }
+  .phrase-note { font-size: 13px; color: var(--label3); margin-top: 4px; font-style: italic; }
+
+  .speak-btn { flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%; background: var(--blue); border: none; color: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: opacity 0.15s, transform 0.1s; }
+  .speak-btn:active { transform: scale(0.9); opacity: 0.8; }
+  .speak-btn.playing { background: var(--orange); animation: speakpulse 0.7s infinite; }
+  .speak-btn-sm { width: 36px; height: 36px; font-size: 15px; }
+  @keyframes speakpulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+
+  .tip-box { background: rgba(0,122,255,0.08); border-radius: var(--card-radius); padding: 14px 16px; margin: 12px 0; font-size: 15px; color: var(--label2); line-height: 1.55; border-left: 4px solid var(--blue); }
+  .tip-box strong { color: var(--label); font-weight: 600; }
+
+  .breakdown-card { background: var(--surface); border-radius: var(--card-radius); overflow: hidden; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .breakdown-phrase-row { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--separator); background: rgba(0,122,255,0.04); }
+  .breakdown-full-greek { font-size: 20px; font-weight: 600; color: var(--blue); flex: 1; }
+  .breakdown-english-label { font-size: 13px; color: var(--label3); padding: 8px 16px 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+  .bd-row { display: grid; grid-template-columns: 1fr 1fr 1.4fr; border-bottom: 1px solid var(--separator); }
+  .bd-row:last-child { border-bottom: none; }
+  .bd-row.bd-header { background: var(--surface2); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--label3); }
+  .bd-cell { padding: 10px 14px; font-size: 15px; border-right: 1px solid var(--separator); }
+  .bd-cell:last-child { border-right: none; }
+  .bd-cell.greek { font-size: 18px; font-weight: 600; color: var(--label); }
+  .bd-cell.roman { color: var(--blue); font-style: italic; font-size: 14px; }
+
+  .field-ref { background: var(--surface); border-radius: var(--card-radius); overflow: hidden; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .field-ref-header { background: var(--surface2); padding: 10px 16px; font-size: 13px; font-weight: 700; color: var(--label3); text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid var(--separator); }
+  .field-row { display: flex; padding: 11px 16px; border-bottom: 1px solid var(--separator); align-items: flex-start; gap: 12px; }
+  .field-row:last-child { border-bottom: none; }
+  .field-label-en { font-size: 13px; color: var(--label3); width: 120px; flex-shrink: 0; padding-top: 2px; }
+  .field-label-gr { font-size: 17px; font-weight: 600; color: var(--label); }
+  .field-roman { font-size: 13px; color: var(--blue); font-style: italic; margin-top: 2px; }
+
+  .quiz-card { background: var(--surface); border-radius: var(--card-radius); padding: 18px 16px; margin-top: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .quiz-label { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: var(--label3); margin-bottom: 4px; }
+  .quiz-score { font-size: 13px; color: var(--label3); text-align: right; margin-bottom: 12px; }
+  .quiz-q { font-size: 26px; font-weight: 700; color: var(--label); margin-bottom: 16px; letter-spacing: -0.3px; min-height: 36px; }
+  .quiz-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .quiz-opt { background: var(--surface2); border: 1.5px solid var(--separator); border-radius: 10px; padding: 12px 10px; font-family: var(--font); font-size: 16px; font-weight: 500; color: var(--label); cursor: pointer; text-align: left; transition: all 0.12s; line-height: 1.3; }
+  .quiz-opt:active { opacity: 0.7; }
+  .quiz-opt.correct { background: rgba(52,199,89,0.15); border-color: var(--green); color: var(--green); }
+  .quiz-opt.wrong { background: rgba(255,59,48,0.12); border-color: var(--red); color: var(--red); }
+  .quiz-opt:disabled { cursor: default; }
+  .quiz-fb { font-size: 15px; min-height: 20px; font-weight: 500; }
+  .quiz-actions { display: flex; gap: 10px; margin-top: 14px; justify-content: flex-end; }
+
+  .btn-primary { background: var(--blue); color: #fff; border: none; border-radius: 10px; padding: 12px 20px; font-family: var(--font); font-size: 16px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+  .btn-primary:active { opacity: 0.8; }
+  .btn-ghost { background: var(--surface2); color: var(--blue); border: 1.5px solid var(--separator); border-radius: 10px; padding: 11px 18px; font-family: var(--font); font-size: 15px; font-weight: 500; cursor: pointer; }
+  .btn-ghost:active { opacity: 0.7; }
+
+  .next-btn { display: flex; align-items: center; justify-content: space-between; background: var(--blue); color: #fff; border: none; border-radius: var(--card-radius); padding: 16px 18px; font-family: var(--font); font-size: 17px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 24px; transition: opacity 0.15s; }
+  .next-btn:active { opacity: 0.85; }
+
+  .tts-notice { background: var(--surface); border-radius: var(--card-radius); padding: 12px 16px; font-size: 14px; color: var(--label3); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+
+  .progress-dots { display: flex; gap: 5px; margin-bottom: 16px; }
+  .progress-dot { height: 4px; border-radius: 2px; background: var(--separator); flex: 1; transition: background 0.3s; }
+  .progress-dot.done { background: var(--blue); }
+
+  /* Alphabet table */
+  .alpha-table { background: var(--surface); border-radius: var(--card-radius); overflow: hidden; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .alpha-header { display: grid; grid-template-columns: 52px 52px 1fr 2fr 44px; background: var(--blue); color: #fff; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+  .alpha-row { display: grid; grid-template-columns: 52px 52px 1fr 2fr 44px; border-bottom: 1px solid var(--separator); align-items: center; }
+  .alpha-row:last-child { border-bottom: none; }
+  .alpha-row:nth-child(even) { background: rgba(0,122,255,0.03); }
+  .alpha-cell { padding: 10px 8px; font-size: 15px; }
+  .alpha-upper { font-size: 22px; font-weight: 700; color: var(--blue); }
+  .alpha-lower { font-size: 22px; font-weight: 400; color: var(--label); }
+  .alpha-latin { font-size: 14px; color: var(--terracotta, #c4603a); font-style: italic; font-weight: 600; }
+  .alpha-note { font-size: 13px; color: var(--label3); line-height: 1.4; }
+  .alpha-speak { width: 38px; height: 38px; border-radius: 50%; background: var(--blue); border: none; color: #fff; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .alpha-speak:active { opacity: 0.7; transform: scale(0.9); }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <img id="headerLogo" alt="Oroboro" style="height:38px;width:auto;object-fit:contain;">
+  <script>document.getElementById('headerLogo').src=OROBORO_LOGO;</script>
+  <div class="app-subtitle">Greek for Sailors</div>
+</div>
+<div class="cat-scroll" id="catNav"></div>
+<div class="lesson-scroll" id="lessonNav"></div>
+<main>
+  <div class="tts-notice" id="ttsNotice">🔊 Tap the blue button on any phrase to hear it spoken</div>
+  <div id="lessonsContainer"></div>
+</main>
+
+<script>
+const cats = [
+  { name: "Basics", icon: "👋" },
+  { name: "Getting Around", icon: "🗺️" },
+  { name: "Shopping & Services", icon: "🛒" },
+  { name: "Maritime & Official", icon: "⚓" },
+  { name: "Kite Surfing", icon: "🪁" },
+  { name: "Wing Foiling", icon: "🌊" },
+  { name: "Ice Breakers", icon: "😄" },
+  { name: "Sentence Structure", icon: "📖" },
+  { name: "Grammar", icon: "📝" },
+];
+
+const lessons = [
+
+// ══════════════════════════════════════
+//  BASICS
+// ══════════════════════════════════════
+{
+  cat: 0,
+  title: "The Alphabet",
+  subtitle: "Greek letters, pronunciation, and how to read them",
+  phrases: [],
+  alphabetTable: true,
+  tip: "The three most important letters to get right: <strong>Β</strong> = V (never B) · <strong>Δ</strong> = TH as in <em>this</em> (never D) · <strong>Χ</strong> = soft KH as in <em>loch</em> (never CH as in church). Master these three and Greek pronunciation clicks into place.",
+},
+
+{
+  cat: 1, title: "Directions", subtitle: "Ask for and understand directions",
+  phrases: [
+    { greek: "Πού είναι...;", roman: "Pu íne...?", english: "Where is...?" },
+    { greek: "Πώς πάω στο...;", roman: "Pós páo sto...?", english: "How do I get to...?" },
+    { greek: "Είναι μακριά;", roman: "Íne makriá?", english: "Is it far?" },
+    { greek: "Στρίψτε αριστερά", roman: "Strípste aristerá", english: "Turn left" },
+    { greek: "Στρίψτε δεξιά", roman: "Strípste dexiá", english: "Turn right" },
+    { greek: "Ευθεία", roman: "Efthía", english: "Straight ahead" },
+    { greek: "Στη γωνία", roman: "Sti gonía", english: "At the corner" },
+    { greek: "Απέναντι από...", roman: "Apénandi apó...", english: "Opposite / Across from..." },
+    { greek: "Δίπλα στο...", roman: "Dípla sto...", english: "Next to..." },
+    { greek: "Πόσα χιλιόμετρα;", roman: "Pósa hiliómeta?", english: "How many kilometres?" },
+    { greek: "Μπορείτε να μου δείξετε στον χάρτη;", roman: "Boríte na mu díxete ston hárti?", english: "Can you show me on the map?" },
+    { greek: "Έχω χαθεί", roman: "Ého hathí", english: "I am lost" },
+  ],
+  vocabGroups: [
+    {
+      title: "Places in town — Πού είναι...;",
+      items: [
+        { greek: "το λιμάνι", roman: "to limáni", english: "the harbour / port" },
+        { greek: "το λιμεναρχείο", roman: "to limenarheío", english: "the harbour master's office" },
+        { greek: "το τελωνείο", roman: "to telonío", english: "the customs office" },
+        { greek: "η αγορά", roman: "i agorá", english: "the market" },
+        { greek: "το σούπερ μάρκετ", roman: "to súper márket", english: "the supermarket" },
+        { greek: "το φαρμακείο", roman: "to farmakío", english: "the pharmacy" },
+        { greek: "το νοσοκομείο", roman: "to nosokomío", english: "the hospital" },
+        { greek: "ο γιατρός", roman: "o yiatrós", english: "the doctor" },
+        { greek: "η αστυνομία", roman: "i astinomía", english: "the police" },
+        { greek: "ο σταθμός", roman: "o stathmós", english: "the station (bus / train)" },
+        { greek: "το αεροδρόμιο", roman: "to aerodrómio", english: "the airport" },
+        { greek: "η τράπεζα", roman: "i trápeza", english: "the bank" },
+        { greek: "το ΑΤΜ", roman: "to ATM", english: "the ATM / cash machine" },
+        { greek: "το ταχυδρομείο", roman: "to tahidromío", english: "the post office" },
+        { greek: "η εκκλησία", roman: "i eklisía", english: "the church" },
+        { greek: "η πλατεία", roman: "i platía", english: "the town square" },
+        { greek: "η παραλία", roman: "i paralía", english: "the beach" },
+        { greek: "το εστιατόριο", roman: "to estiатório", english: "the restaurant" },
+        { greek: "το καφενείο", roman: "to kafenío", english: "the café / coffee shop" },
+        { greek: "το ξενοδοχείο", roman: "to xenodohío", english: "the hotel" },
+        { greek: "η τουαλέτα", roman: "i tualéta", english: "the toilet / WC" },
+        { greek: "το βενζινάδικο", roman: "to venzinádiko", english: "the petrol station" },
+        { greek: "ο μηχανικός", roman: "o mihanikós", english: "the mechanic" },
+        { greek: "το αρτοποιείο", roman: "to artopiío", english: "the bakery" },
+        { greek: "το κρεοπωλείο", roman: "to kreopoleío", english: "the butcher" },
+        { greek: "το ψαράδικο", roman: "to psarádiko", english: "the fish market / fishmonger" },
+        { greek: "το περίπτερο", roman: "to períptero", english: "the kiosk (newspaper / snacks)" },
+        { greek: "ο ψαράς", roman: "o psarás", english: "the fisherman" },
+        { greek: "ο ναυαγοσώστης", roman: "o navagoсóstis", english: "the lifeguard" },
+        { greek: "το surf shop", roman: "to surf shop", english: "the surf / kite shop" },
+      ]
+    }
+  ],
+  tip: "Combine the question with a place: <strong>Πού είναι η παραλία;</strong> (Where is the beach?) · <strong>Πού είναι το φαρμακείο;</strong> (Where is the pharmacy?)",
+  quiz: [
+    { q: "η παραλία", opts: ["the harbour","the beach","the market","the hotel"], a: "the beach" },
+    { q: "το φαρμακείο", opts: ["the hospital","the pharmacy","the doctor","the police"], a: "the pharmacy" },
+    { q: "Ευθεία", opts: ["Turn left","Straight ahead","At the corner","Turn right"], a: "Straight ahead" },
+    { q: "Έχω χαθεί", opts: ["It is far","I am lost","Show me the map","How many km?"], a: "I am lost" },
+  ]
+},
+{
+  cat: 0, title: "Greetings", subtitle: "Say hello, goodbye, and be polite",
+  phrases: [
+    { greek: "Γεια σου", roman: "Ya su", english: "Hello / Hi (informal)", note: "Literally 'health to you' — one person" },
+    { greek: "Γεια σας", roman: "Ya sas", english: "Hello (formal or to a group)" },
+    { greek: "Καλημέρα", roman: "Kali-méra", english: "Good morning" },
+    { greek: "Καλησπέρα", roman: "Kali-spéra", english: "Good evening" },
+    { greek: "Καληνύχτα", roman: "Kali-níhta", english: "Good night" },
+    { greek: "Αντίο", roman: "Adío", english: "Goodbye" },
+    { greek: "Τα λέμε", roman: "Ta léme", english: "See you later", note: "Literally 'we'll say things' — very common" },
+    { greek: "Χάρηκα", roman: "Hárika", english: "Nice to meet you", note: "Literally 'I was pleased' — the natural everyday expression" },
+  ],
+  tip: "<strong>Γεια σου</strong> is the Swiss army knife of Greek greetings — used for hello, goodbye, and even as a toast when clinking glasses.",
+  quiz: [
+    { q: "Καλημέρα", opts: ["Good night","Good morning","Goodbye","Hello"], a: "Good morning" },
+    { q: "Γεια σου", opts: ["See you later","Good evening","Hello / Hi","Nice to meet you"], a: "Hello / Hi" },
+    { q: "Αντίο", opts: ["Goodbye","Good morning","Good night","Hello"], a: "Goodbye" },
+    { q: "Καληνύχτα", opts: ["Good morning","Good evening","Good night","See you later"], a: "Good night" },
+  ]
+},
+{
+  cat: 0, title: "How are you?", subtitle: "Ask and answer about wellbeing",
+  phrases: [
+    { greek: "Πώς είσαι;", roman: "Pós íse?", english: "How are you? (informal)" },
+    { greek: "Πώς είστε;", roman: "Pós íste?", english: "How are you? (formal / plural)" },
+    { greek: "Πώς είναι;", roman: "Pós íne?", english: "How is he / she / it?" },
+    { greek: "Τι κάνεις;", roman: "Ti kánis?", english: "What are you doing? / How are you?", note: "The most common casual greeting" },
+    { greek: "Καλά, ευχαριστώ", roman: "Kalá, efharistó", english: "Fine, thank you" },
+    { greek: "Πολύ καλά", roman: "Polí kalá", english: "Very well" },
+    { greek: "Έτσι κι έτσι", roman: "Étsi ki étsi", english: "So-so", note: "Literally 'like this and like that'" },
+    { greek: "Δεν είμαι καλά", roman: "Den íme kalá", english: "I'm not well" },
+  ],
+  tip: "<strong>Τι κάνεις;</strong> literally means 'what are you doing?' but functions exactly like 'how are you?' Just answer <strong>Καλά</strong> (fine).",
+  quiz: [
+    { q: "Καλά, ευχαριστώ", opts: ["So-so","I'm not well","Fine, thank you","Very well"], a: "Fine, thank you" },
+    { q: "Έτσι κι έτσι", opts: ["Very well","So-so","Fine","Good night"], a: "So-so" },
+    { q: "Τι κάνεις;", opts: ["How is she?","What are you doing?","Nice to meet you","Goodbye"], a: "What are you doing?" },
+    { q: "Πολύ καλά", opts: ["Good morning","So-so","Fine thanks","Very well"], a: "Very well" },
+  ]
+},
+{
+  cat: 0, title: "Please & Thank You", subtitle: "Essential polite expressions",
+  phrases: [
+    { greek: "Ευχαριστώ", roman: "Efharistó", english: "Thank you" },
+    { greek: "Ευχαριστώ πολύ", roman: "Efharistó polí", english: "Thank you very much" },
+    { greek: "Παρακαλώ", roman: "Parakaló", english: "Please / You're welcome", note: "Same word for both — context tells you which" },
+    { greek: "Συγγνώμη", roman: "Sig-nómi", english: "Sorry / Excuse me" },
+    { greek: "Με συγχωρείς", roman: "Me sinhurís", english: "Pardon me (to one person)" },
+    { greek: "Τίποτα", roman: "Típota", english: "Nothing / Don't mention it" },
+    { greek: "Ναι", roman: "Ne", english: "Yes", note: "⚠️ Sounds like 'nay' — confusing for English speakers!" },
+    { greek: "Όχι", roman: "Óhi", english: "No" },
+  ],
+  tip: "<strong>Παρακαλώ</strong> covers 'please', 'you're welcome', and 'go ahead / here you go' — one of the most useful words in the language.",
+  quiz: [
+    { q: "Ναι", opts: ["No","Maybe","Yes","Please"], a: "Yes" },
+    { q: "Παρακαλώ", opts: ["Sorry","Thank you","Please / You're welcome","Excuse me"], a: "Please / You're welcome" },
+    { q: "Ευχαριστώ", opts: ["You're welcome","Sorry","Thank you","Yes"], a: "Thank you" },
+    { q: "Όχι", opts: ["Yes","No","Maybe","Sorry"], a: "No" },
+  ]
+},
+{
+  cat: 0, title: "Introductions", subtitle: "Tell people who you are",
+  phrases: [
+    { greek: "Με λένε...", roman: "Me léne...", english: "My name is..." },
+    { greek: "Πώς σε λένε;", roman: "Pós se léne?", english: "What's your name? (informal)" },
+    { greek: "Από πού είσαι;", roman: "Apó pu íse?", english: "Where are you from?" },
+    { greek: "Είμαι από...", roman: "Íme apó...", english: "I am from..." },
+    { greek: "Μιλάς αγγλικά;", roman: "Milás angliká?", english: "Do you speak English?" },
+    { greek: "Μιλώ λίγο ελληνικά", roman: "Miló lígo eliniká", english: "I speak a little Greek" },
+    { greek: "Δεν καταλαβαίνω", roman: "Den katalavéno", english: "I don't understand" },
+    { greek: "Μπορείς να το επαναλάβεις;", roman: "Borís na to epanalávis?", english: "Can you repeat that?" },
+  ],
+  tip: "Telling someone <strong>Μιλώ λίγο ελληνικά</strong> immediately wins you warm smiles. Greeks genuinely appreciate any effort to speak their language.",
+  quiz: [
+    { q: "Με λένε...", opts: ["I am from...","My name is...","Where are you from?","I don't understand"], a: "My name is..." },
+    { q: "Δεν καταλαβαίνω", opts: ["I speak Greek","Can you repeat?","I don't understand","I am from..."], a: "I don't understand" },
+    { q: "Από πού είσαι;", opts: ["What's your name?","Do you speak English?","Where are you from?","Can you repeat?"], a: "Where are you from?" },
+    { q: "Μιλώ λίγο ελληνικά", opts: ["I don't speak Greek","I speak a little Greek","Do you speak Greek?","I understand Greek"], a: "I speak a little Greek" },
+  ]
+},,
+{
+  cat: 0, title: "At a Café", subtitle: "Order drinks like a local",
+  phrases: [
+    { greek: "Θέλω έναν καφέ", roman: "Thélo énan kafé", english: "I want a coffee" },
+    { greek: "Θέλω έναν καπουτσίνο", roman: "Thélo énan kapoutsíno", english: "I want a cappuccino" },
+    { greek: "Θέλω μία μπύρα", roman: "Thélo mía bíra", english: "I want a beer" },
+    { greek: "Θέλω ένα νερό", roman: "Thélo éna neró", english: "I want a water" },
+    { greek: "Θέλω ένα κρασί", roman: "Thélo éna krasí", english: "I want a wine" },
+    { greek: "Θέλω ένα κόκκινο κρασί", roman: "Thélo éna kókino krasí", english: "I want a red wine" },
+    { greek: "Θέλω ένα λευκό κρασί", roman: "Thélo éna lefkó krasí", english: "I want a white wine" },
+    { greek: "Θέλω έναν χυμό πορτοκάλι", roman: "Thélo énan himó portokáli", english: "I want an orange juice" },
+    { greek: "Θέλω ένα τσάι", roman: "Thélo éna tsái", english: "I want a tea" },
+    { greek: "Θέλω έναν ελληνικό καφέ", roman: "Thélo énan elinikó kafé", english: "I want a Greek coffee" },
+    { greek: "Θέλω έναν φραπέ", roman: "Thélo énan frapé", english: "I want a frappé", note: "Cold frothy instant coffee — a Greek invention" },
+    { greek: "Θέλω έναν φρέντο εσπρέσο", roman: "Thélo énan frédo espréso", english: "I want a freddo espresso", note: "Cold shaken espresso — very popular in Greece" },
+    { greek: "Με γάλα", roman: "Me gála", english: "With milk" },
+    { greek: "Χωρίς ζάχαρη", roman: "Horís záhari", english: "Without sugar" },
+    { greek: "Τον λογαριασμό, παρακαλώ", roman: "Ton logariazmó, parakaló", english: "The bill, please" },
+    { greek: "Στην υγειά μας!", roman: "Stin iyá mas!", english: "Cheers!" },
+  ],
+  tip: "Notice the pattern: <strong>Θέλω</strong> (I want) + the drink. Always ask for <strong>ελληνικό καφέ</strong> — never a 'Turkish coffee', even though they're the same drink.",
+  quiz: [
+    { q: "Θέλω μία μπύρα", opts: ["I want a coffee","I want a beer","I want a wine","I want a water"], a: "I want a beer" },
+    { q: "Θέλω έναν καπουτσίνο", opts: ["I want a cappuccino","I want a tea","I want a coffee","I want a juice"], a: "I want a cappuccino" },
+    { q: "Χωρίς ζάχαρη", opts: ["With milk","Without sugar","A Greek coffee","The bill"], a: "Without sugar" },
+    { q: "Στην υγειά μας!", opts: ["Good health","Cheers!","Thank you","See you later"], a: "Cheers!" },
+  ]
+},
+{
+  cat: 0, title: "At a Restaurant", subtitle: "Order meals and navigate the menu",
+  phrases: [
+    { greek: "Θέλω να παραγγείλω", roman: "Thélo na paragilо", english: "I would like to order" },
+    { greek: "Τι έχετε σήμερα;", roman: "Ti éhete símera?", english: "What do you have today?" },
+    { greek: "Θέλω ένα σουβλάκι", roman: "Thélo éna souvláki", english: "I want a souvlaki" },
+    { greek: "Θέλω μία μερίδα χταπόδι", roman: "Thélo mía merída htapódi", english: "I want a portion of octopus" },
+    { greek: "Θέλω φρέσκο ψάρι", roman: "Thélo frésko psári", english: "I want fresh fish" },
+    { greek: "Θέλω χωριάτικη σαλάτα", roman: "Thélo horiátiki saláta", english: "I want a Greek village salad" },
+    { greek: "Χωρίς κρέας, παρακαλώ", roman: "Horís kréas, parakaló", english: "Without meat, please" },
+    { greek: "Είμαι χορτοφάγος", roman: "Íme hortofágos", english: "I am vegetarian" },
+    { greek: "Είναι νόστιμο!", roman: "Íne nóstimo!", english: "It is delicious!" },
+    { greek: "Φέρε μου λίγο ψωμί", roman: "Fére mu lígo psomí", english: "Bring me some bread" },
+    { greek: "Τον λογαριασμό, παρακαλώ", roman: "Ton logariazmó, parakaló", english: "The bill, please" },
+  ],
+  tip: "Asking <strong>Τι έχετε σήμερα;</strong> (what do you have today?) often gets you the freshest, off-menu options — especially for fish. Always a good move.",
+  quiz: [
+    { q: "Θέλω ένα σουβλάκι", opts: ["I want a salad","I want a souvlaki","I want a fish","I want octopus"], a: "I want a souvlaki" },
+    { q: "Είμαι χορτοφάγος", opts: ["I am hungry","I am vegetarian","Without meat","I want salad"], a: "I am vegetarian" },
+    { q: "Είναι νόστιμο!", opts: ["It is fresh!","It is cheap!","It is delicious!","It is cold!"], a: "It is delicious!" },
+    { q: "Τι έχετε σήμερα;", opts: ["What is the price?","What do you have today?","What is fresh?","What do you recommend?"], a: "What do you have today?" },
+  ]
+},
+
+// ══════════════════════════════════════
+//  GETTING AROUND
+// ══════════════════════════════════════
+{
+  cat: 1, title: "Buses & Trains", subtitle: "Navigate public transport with confidence",
+  phrases: [
+    { greek: "Πού είναι η στάση;", roman: "Pu íne i stási?", english: "Where is the bus stop?" },
+    { greek: "Πού είναι ο σταθμός;", roman: "Pu íne o stathmós?", english: "Where is the station?" },
+    { greek: "Πότε φεύγει το λεωφορείο;", roman: "Póte févgi to leoforío?", english: "When does the bus leave?" },
+    { greek: "Πότε φτάνει το τρένο;", roman: "Póte ftáni to tréno?", english: "When does the train arrive?" },
+    { greek: "Ένα εισιτήριο για..., παρακαλώ", roman: "Éna isitirio ya..., parakaló", english: "One ticket to..., please" },
+    { greek: "Δύο εισιτήρια", roman: "Dío isitíria", english: "Two tickets" },
+    { greek: "Απλό ή μετ' επιστροφής;", roman: "Apló í met epistrofís?", english: "Single or return?" },
+    { greek: "Από ποια αποβάθρα;", roman: "Apó pia apovátra?", english: "From which platform?" },
+    { greek: "Αυτό το λεωφορείο πάει στο...;", roman: "Aftó to leoforío pái sto...?", english: "Does this bus go to...?" },
+    { greek: "Πού πρέπει να κατέβω;", roman: "Pu prépi na katévo?", english: "Where do I get off?" },
+    { greek: "Έχει καθυστέρηση", roman: "Éhi kathistérisi", english: "It is delayed" },
+  ],
+  tip: "Intercity buses are run by <strong>ΚΤΕΛ</strong> (KTEL). The Athens metro is <strong>μετρό</strong>. Always validate your ticket before boarding.",
+  quiz: [
+    { q: "Πότε φεύγει το λεωφορείο;", opts: ["Where is the station?","When does the bus leave?","Which platform?","Two tickets"], a: "When does the bus leave?" },
+    { q: "Ένα εισιτήριο για...", opts: ["One ticket to...","The next bus","It is delayed","Where do I get off?"], a: "One ticket to..." },
+    { q: "Έχει καθυστέρηση", opts: ["It is on time","It is delayed","Single or return?","Next bus"], a: "It is delayed" },
+    { q: "Πού πρέπει να κατέβω;", opts: ["When does it arrive?","Which platform?","Where do I get off?","Does this bus go to...?"], a: "Where do I get off?" },
+  ]
+},
+
+// ══════════════════════════════════════
+//  SHOPPING & SERVICES
+// ══════════════════════════════════════
+{
+  cat: 2, title: "Grocery Shopping", subtitle: "Navigate the supermarket and market",
+  phrases: [
+    { greek: "Πού είναι το σούπερ μάρκετ;", roman: "Pu íne to súper márket?", english: "Where is the supermarket?" },
+    { greek: "Θέλω ένα κιλό ντομάτες", roman: "Thélo éna kiló domátes", english: "I want one kilo of tomatoes" },
+    { greek: "Θέλω μισό κιλό τυρί", roman: "Thélo misó kiló tirí", english: "I want half a kilo of cheese" },
+    { greek: "Θέλω λίγο ψωμί", roman: "Thélo lígo psomí", english: "I want a little bread" },
+    { greek: "Θέλω φρέσκο ψάρι", roman: "Thélo frésko psári", english: "I want fresh fish" },
+    { greek: "Έχετε...;", roman: "Éhete...?", english: "Do you have...?" },
+    { greek: "Είναι φρέσκο;", roman: "Íne frésko?", english: "Is it fresh?" },
+    { greek: "Μπορώ να δοκιμάσω;", roman: "Boró na dokimáso?", english: "Can I try a taste?" },
+    { greek: "Πόσο κοστίζει αυτό;", roman: "Póso kostízi aftó?", english: "How much does this cost?" },
+    { greek: "Μια σακούλα, παρακαλώ", roman: "Mia sakúla, parakaló", english: "A bag, please" },
+    { greek: "Πληρώνω με κάρτα", roman: "Pliróno me kárta", english: "I'm paying by card" },
+    { greek: "Έχετε ρέστα;", roman: "Éhete résta?", english: "Do you have change?" },
+  ],
+  tip: "Greek street markets — <strong>λαϊκές αγορές</strong> — happen in every neighbourhood on set days. The produce is fresher and cheaper than supermarkets, and the vendors love a bit of conversation.",
+  quiz: [
+    { q: "Θέλω ένα κιλό ντομάτες", opts: ["I want bread","I want tomatoes","I want fish","I want cheese"], a: "I want tomatoes" },
+    { q: "Είναι φρέσκο;", opts: ["Is it local?","Can I try it?","Is it fresh?","How much?"], a: "Is it fresh?" },
+    { q: "Πληρώνω με κάρτα", opts: ["Do you have change?","I'm paying by card","A bag please","Half a kilo"], a: "I'm paying by card" },
+    { q: "Μπορώ να δοκιμάσω;", opts: ["Can I try?","Can I buy?","Is it fresh?","A little bread"], a: "Can I try?" },
+  ]
+},
+{
+  cat: 2, title: "Post Office", subtitle: "Send letters, parcels, and pay bills",
+  phrases: [
+    { greek: "Πού είναι το ταχυδρομείο;", roman: "Pu íne to tahidromío?", english: "Where is the post office?" },
+    { greek: "Θέλω να στείλω αυτό το πακέτο", roman: "Thélo na stílo aftó to pakéto", english: "I want to send this parcel" },
+    { greek: "Θέλω να στείλω ένα γράμμα", roman: "Thélo na stílo éna gráma", english: "I want to send a letter" },
+    { greek: "Για την Αγγλία / Αμερική", roman: "Ya tin Anglía / Amérikí", english: "To England / America" },
+    { greek: "Συστημένο, παρακαλώ", roman: "Sistméno, parakaló", english: "Registered mail, please" },
+    { greek: "Πόσο κάνει η αποστολή;", roman: "Póso káni i apostolí?", english: "How much is the postage?" },
+    { greek: "Πότε θα φτάσει;", roman: "Póte tha ftási?", english: "When will it arrive?" },
+    { greek: "Θέλω γραμματόσημα", roman: "Thélo gramatósima", english: "I want stamps" },
+    { greek: "Έχω ένα δέμα να παραλάβω", roman: "Ého éna déma na paralávo", english: "I have a parcel to collect" },
+    { greek: "Την ταυτότητά μου", roman: "Tin taftótitá mu", english: "My ID" },
+  ],
+  tip: "Greek post offices (<strong>ΕΛΤΑ</strong>) also function as payment points for utility bills. Queues can be long — arrive early. Always bring your <strong>ταυτότητα</strong> (ID) for parcel collection.",
+  quiz: [
+    { q: "Συστημένο, παρακαλώ", opts: ["Express mail","Registered mail","A stamp please","Insured parcel"], a: "Registered mail" },
+    { q: "Πότε θα φτάσει;", opts: ["How much is postage?","When will it arrive?","Where is the post office?","I want stamps"], a: "When will it arrive?" },
+    { q: "Θέλω γραμματόσημα", opts: ["I want stamps","I want to send a letter","Registered mail","My ID"], a: "I want stamps" },
+    { q: "Έχω ένα δέμα να παραλάβω", opts: ["I want to send a parcel","I have a parcel to collect","How much is postage?","When will it arrive?"], a: "I have a parcel to collect" },
+  ]
+},
+
+// ══════════════════════════════════════
+//  MARITIME & OFFICIAL
+// ══════════════════════════════════════
+{
+  cat: 3, title: "Coast Guard", subtitle: "Essential phrases for maritime safety",
+  phrases: [
+    { greek: "Λιμενικό Σώμα", roman: "Limeniko Sóma", english: "Hellenic Coast Guard", note: "Emergency: call 108" },
+    { greek: "Χρειαζόμαστε βοήθεια", roman: "Hriaazómaste voíthia", english: "We need assistance" },
+    { greek: "Μέιντεϊ — Μέιντεϊ — Μέιντεϊ", roman: "Méindei — Méindei — Méindei", english: "Mayday — Mayday — Mayday", note: "Always said three times on VHF Channel 16" },
+    { greek: "Το σκάφος μας βυθίζεται", roman: "To skáfos mas vithízete", english: "Our vessel is sinking" },
+    { greek: "Υπάρχει πυρκαγιά στο σκάφος", roman: "Ipárhi pyrkayá sto skáfos", english: "There is a fire on board" },
+    { greek: "Άνθρωπος στη θάλασσα!", roman: "Ánthropos sti thálasa!", english: "Man overboard!" },
+    { greek: "Η θέση μας είναι...", roman: "I thési mas íne...", english: "Our position is..." },
+    { greek: "Πόσα άτομα επί του σκάφους;", roman: "Pósa átoma epí tu skáfus?", english: "How many persons on board?" },
+    { greek: "Έχουμε τραυματία", roman: "Éhume travmatía", english: "We have an injured person on board" },
+    { greek: "Χρειαζόμαστε ρυμούλκηση", roman: "Hriaazómaste rimúlkisi", english: "We need a tow" },
+    { greek: "Το όνομα του σκάφους", roman: "To ónoma tu skáfus", english: "The name of the vessel" },
+  ],
+  tip: "Coast Guard emergency: <strong>108</strong>. On VHF radio, <strong>Channel 16</strong> is the international distress and calling channel — monitored 24/7. Always state vessel name, position (GPS if possible), and number of persons on board.",
+  quiz: [
+    { q: "Άνθρωπος στη θάλασσα!", opts: ["Fire on board","Man overboard!","We are sinking","We need a tow"], a: "Man overboard!" },
+    { q: "Χρειαζόμαστε βοήθεια", opts: ["We need a tow","We need assistance","Our position is","How many on board?"], a: "We need assistance" },
+    { q: "Το σκάφος μας βυθίζεται", opts: ["We have injured","Our vessel is sinking","There is fire","Man overboard"], a: "Our vessel is sinking" },
+    { q: "Έχουμε τραυματία", opts: ["We need a tow","We are sinking","We have an injured person on board","Fire on board"], a: "We have an injured person on board" },
+  ]
+},
+{
+  cat: 3, title: "Transit Log — AADE", subtitle: "Customs declarations for pleasure vessels over 7m",
+  phrases: [
+    { greek: "Πού είναι το τελωνείο;", roman: "Pu íne to telonío?", english: "Where is the customs office?" },
+    { greek: "Θέλω να υποβάλω το Transit Log", roman: "Thélo na ipoválo to Transit Log", english: "I want to submit the Transit Log" },
+    { greek: "Έχω να δηλώσω...", roman: "Ého na dilóso...", english: "I have to declare..." },
+    { greek: "Δεν έχω τίποτα να δηλώσω", roman: "Den ého típota na dilóso", english: "I have nothing to declare" },
+    { greek: "Αυτό είναι για προσωπική χρήση", roman: "Aftó íne ya prosopikí hrísi", english: "This is for personal use" },
+    { greek: "Ποια είναι τα απαραίτητα έγγραφα;", roman: "Pia íne ta aparétita éngrafa?", english: "What are the required documents?" },
+    { greek: "Η σημαία καταχώρησης", roman: "I siméa katahórisis", english: "The flag of registry" },
+    { greek: "Δεν κατανοώ τη διαδικασία", roman: "Den katanó ti diadikasía", english: "I don't understand the procedure" },
+    { greek: "Μπορώ να έχω διερμηνέα;", roman: "Boró na ého diermïnéa?", english: "Can I have an interpreter?" },
+    { greek: "Το myAADE portal", roman: "To myAADE portal", english: "The myAADE digital portal", note: "Submit Transit Logs online at myaade.gov.gr" },
+  ],
+  tip: "Since 2024, Transit Logs are submitted digitally via <strong>myaade.gov.gr</strong>. For non-EU flagged vessels over 7m the Transit Log costs €30 and is valid 6 months. Submit it at your <strong>first port of entry</strong> into Greece, then present it at every subsequent port.",
+  formRef: {
+    title: "Transit Log — Key Fields (Δελτίο Κίνησης Σκάφους)",
+    fields: [
+      { en: "Vessel name", greek: "Όνομα σκάφους", roman: "Ónoma skáfus" },
+      { en: "Flag / Registry", greek: "Σημαία / Νηολόγιο", roman: "Siméa / Niolóyio" },
+      { en: "Overall length", greek: "Ολικό μήκος", roman: "Olikó míkos" },
+      { en: "Engine power (HP)", greek: "Ισχύς μηχανής (ΗΡ)", roman: "Ishís mihanis" },
+      { en: "Home port", greek: "Λιμένας νηολόγησης", roman: "Liménas niolóyisis" },
+      { en: "Port of entry", greek: "Λιμένας εισόδου", roman: "Liménas isóðu" },
+      { en: "Date of arrival", greek: "Ημερομηνία άφιξης", roman: "Imerominía áfixis" },
+      { en: "Owner / skipper", greek: "Πλοιοκτήτης / Κυβερνήτης", roman: "Ploioktiтis / Kivernítis" },
+      { en: "Owner's country", greek: "Χώρα κατοικίας", roman: "Hóra katikías" },
+      { en: "Insurance document", greek: "Ασφαλιστήριο σκάφους", roman: "Asfalistírio skáfus" },
+      { en: "Fuel on board (lt)", greek: "Καύσιμα επί σκάφους", roman: "Káfsima epí skáfus" },
+    ]
+  },
+  quiz: [
+    { q: "Δεν έχω τίποτα να δηλώσω", opts: ["I have to declare something","Nothing to declare","Personal use","Entry declaration"], a: "Nothing to declare" },
+    { q: "Η σημαία καταχώρησης", opts: ["Vessel documents","Flag of registry","Crew list","Exit declaration"], a: "Flag of registry" },
+    { q: "Ποια είναι τα απαραίτητα έγγραφα;", opts: ["What are the fees?","What are the required documents?","What is the procedure?","Where is customs?"], a: "What are the required documents?" },
+    { q: "Μπορώ να έχω διερμηνέα;", opts: ["Can I have a lawyer?","Can I have an interpreter?","I don't understand","Can I call the embassy?"], a: "Can I have an interpreter?" },
+  ]
+},
+{
+  cat: 3, title: "Crew List & Seaman Book", subtitle: "Crew documentation and identity at Greek ports",
+  phrases: [
+    { greek: "Κατάλογος πληρώματος", roman: "Katálogos plirómatos", english: "Crew list" },
+    { greek: "Ναυτικό φυλλάδιο", roman: "Naftikó filádio", english: "Seaman book / Seafarer's identity document" },
+    { greek: "Διαβατήριο", roman: "Diavatírio", english: "Passport" },
+    { greek: "Το ναυτικό φυλλάδιο αντί διαβατηρίου", roman: "To naftikó filádio andí diavatiriú", english: "The seaman book instead of a passport", note: "Stops Schengen days counting under ILO Convention 108/185" },
+    { greek: "Μέλος πληρώματος", roman: "Mélos plirómatos", english: "Crew member" },
+    { greek: "Επιβάτης", roman: "Epivátis", english: "Passenger" },
+    { greek: "Πλοίαρχος / Κυβερνήτης", roman: "Ploíarhos / Kivernítis", english: "Captain / Skipper" },
+    { greek: "Ιθαγένεια", roman: "Ithaγénia", english: "Nationality" },
+    { greek: "Ημερομηνία γέννησης", roman: "Imerominía génnisis", english: "Date of birth" },
+    { greek: "Είμαστε ... άτομα", roman: "Ímaste ... átoma", english: "We are ... people on board" },
+  ],
+  tip: "Under Schengen Regulation EU 2016/399, crew members with a <strong>valid seaman book</strong> are not subject to the 90-day Schengen limit. Without it, they are treated as ordinary passengers and Schengen days start counting. The seaman book can be issued by any flag state.",
+  formRef: {
+    title: "Crew List — Key Fields (Κατάλογος Πληρώματος)",
+    fields: [
+      { en: "Full name", greek: "Ονοματεπώνυμο", roman: "Onomatepónymo" },
+      { en: "Rank / Role", greek: "Βαθμός / Ιδιότητα", roman: "Vathmós / Idiotita" },
+      { en: "Nationality", greek: "Ιθαγένεια", roman: "Ithaγénia" },
+      { en: "Date of birth", greek: "Ημερομηνία γέννησης", roman: "Imerominía génnisis" },
+      { en: "Place of birth", greek: "Τόπος γέννησης", roman: "Tópos génnisis" },
+      { en: "Passport No.", greek: "Αριθμός διαβατηρίου", roman: "Arithmós diavatiriú" },
+      { en: "Seaman Book No.", greek: "Αριθμός ναυτικού φυλλαδίου", roman: "Arithmós naftikoú filadiú" },
+      { en: "Date of issue", greek: "Ημερομηνία έκδοσης", roman: "Imerominía ékdosis" },
+      { en: "Issuing country", greek: "Χώρα έκδοσης", roman: "Hóra ékdosis" },
+      { en: "Port joined", greek: "Λιμένας επιβίβασης", roman: "Liménas epivívasis" },
+    ]
+  },
+  quiz: [
+    { q: "Ναυτικό φυλλάδιο", opts: ["Passport","Crew list","Seaman book","Identity card"], a: "Seaman book" },
+    { q: "Κατάλογος πληρώματος", opts: ["Crew list","Passenger manifest","Port log","Ship's papers"], a: "Crew list" },
+    { q: "Ιθαγένεια", opts: ["Date of birth","Nationality","Passport number","Place of birth"], a: "Nationality" },
+    { q: "Μέλος πληρώματος", opts: ["Passenger","Captain","Crew member","Customs officer"], a: "Crew member" },
+  ]
+},
+{
+  cat: 3, title: "Harbour Master", subtitle: "Port entry, berthing, and official paperwork",
+  phrases: [
+    { greek: "Λιμεναρχείο", roman: "Limenarheío", english: "Harbour Master's office", note: "Legal requirement to check in at every Greek port" },
+    { greek: "Θέλω να δηλώσω άφιξη", roman: "Thélo na dilóso áfixis", english: "I want to declare arrival" },
+    { greek: "Θέλω να δηλώσω αναχώρηση", roman: "Thélo na dilóso anahórisi", english: "I want to declare departure" },
+    { greek: "Πού μπορώ να δέσω;", roman: "Pu boró na déso?", english: "Where can I berth / moor?" },
+    { greek: "Υπάρχει ελεύθερη θέση;", roman: "Ipárhi eléftheri thési?", english: "Is there a free berth?" },
+    { greek: "Το όνομα του σκάφους είναι...", roman: "To ónoma tu skáfus íne...", english: "The name of the vessel is..." },
+    { greek: "Σκάφος αναψυχής", roman: "Skáfos anapsihís", english: "Pleasure craft / leisure vessel" },
+    { greek: "Πόσο κοστίζει η παραμονή ανά νύχτα;", roman: "Póso kostízi i paramoní aná níhta?", english: "How much is berthing per night?" },
+    { greek: "Πρόγνωση καιρού", roman: "Prógnosi keró", english: "Weather forecast" },
+    { greek: "Ισχυροί άνεμοι αναμένονται", roman: "Ishirí ánemi anaménonde", english: "Strong winds are expected" },
+    { greek: "Τα τέλη λιμένα", roman: "Ta téli liména", english: "Port fees / harbour dues" },
+  ],
+  tip: "Checking in with the <strong>Λιμεναρχείο</strong> is a legal requirement in Greece. Bring vessel documents, passports or seaman books for all crew, and the Transit Log. Failure to check in can result in fines.",
+  quiz: [
+    { q: "Λιμεναρχείο", opts: ["The coast guard","The customs office","Harbour Master's office","The marina office"], a: "Harbour Master's office" },
+    { q: "Θέλω να δηλώσω άφιξη", opts: ["I want to depart","I want to declare arrival","I need a berth","I want to pay fees"], a: "I want to declare arrival" },
+    { q: "Υπάρχει ελεύθερη θέση;", opts: ["Is there fresh water?","Is there a free berth?","Where can I moor?","What are the fees?"], a: "Is there a free berth?" },
+    { q: "Πρόγνωση καιρού", opts: ["Wind speed","Weather forecast","Port fees","High tide"], a: "Weather forecast" },
+  ]
+},
+
+// ══════════════════════════════════════
+//  KITE SURFING
+// ══════════════════════════════════════
+{
+  cat: 4, title: "At the Beach", subtitle: "Talk about conditions and equipment",
+  phrases: [
+    { greek: "Πόσο μεγάλος είναι ο αετός σου;", roman: "Póso megálos íne o aetós su?", english: "How big is your kite?", note: "Αετός = kite, literally 'eagle'" },
+    { greek: "Πόσο μεγάλη είναι η σανίδα σου;", roman: "Póso megáli íne i saníða su?", english: "How big is your board?" },
+    { greek: "Τι μέγεθος χρησιμοποιείς σήμερα;", roman: "Ti mégethos hrisimopís símera?", english: "What size are you riding today?" },
+    { greek: "Πόσους κόμβους έχει ο άνεμος;", roman: "Pósos kómvus éhi o ánemos?", english: "How many knots is the wind?" },
+    { greek: "Από πού φυσάει ο άνεμος;", roman: "Apó pu fisáei o ánemos?", english: "Where is the wind coming from?" },
+    { greek: "Είναι καλές οι συνθήκες σήμερα;", roman: "Íne kalés i sinthíkes símera?", english: "Are the conditions good today?" },
+    { greek: "Η παλίρροια ανεβαίνει / κατεβαίνει", roman: "I palíria anevéni / katevéni", english: "The tide is coming in / going out" },
+    { greek: "Πόσο καιρό κάνεις kite;", roman: "Póso keró kánis kite?", english: "How long have you been kiting?" },
+    { greek: "Πού έμαθες;", roman: "Pu émates?", english: "Where did you learn?" },
+    { greek: "Έχεις πάρει μαθήματα;", roman: "Éhis pári mathímata?", english: "Have you taken lessons?" },
+    { greek: "Κάνω kite εδώ και ... χρόνια", roman: "Káno kite eðó ke ... hrónia", english: "I have been kiting for ... years" },
+    { greek: "Είμαι αρχάριος / προχωρημένος", roman: "Íme arhários / prohorïménos", english: "I am a beginner / advanced" },
+  ],
+  tip: "Greek kiters are a friendly community. Asking <strong>Από πού φυσάει ο άνεμος;</strong> and <strong>Πόσους κόμβους;</strong> shows you know your stuff and usually opens up a good conversation.",
+  quiz: [
+    { q: "Πόσο μεγάλος είναι ο αετός σου;", opts: ["How fast are you?","How big is your kite?","What board do you use?","How long have you been kiting?"], a: "How big is your kite?" },
+    { q: "Πόσους κόμβους έχει ο άνεμος;", opts: ["Where is the wind from?","How many knots is the wind?","Are conditions good?","What size kite?"], a: "How many knots is the wind?" },
+    { q: "Είμαι αρχάριος", opts: ["I am advanced","I am a beginner","I am an instructor","I am experienced"], a: "I am a beginner" },
+    { q: "Πού έμαθες;", opts: ["Where do you kite?","Where did you learn?","Where is the school?","Where is the beach?"], a: "Where did you learn?" },
+  ]
+},
+{
+  cat: 4, title: "Gear & Safety", subtitle: "Talk about equipment and stay safe",
+  phrases: [
+    { greek: "Χρησιμοποιώ twin tip / surfboard", roman: "Hrisimopió twin tip / surfboard", english: "I use a twin tip / surfboard" },
+    { greek: "Το bar είναι χαλασμένο", roman: "To bar íne halazméno", english: "The bar is broken" },
+    { greek: "Έχω κολλήσει τον αετό", roman: "Ého kolísi ton aetó", english: "My kite is stuck (in the water / in the air)" },
+    { greek: "Χρειάζομαι βοήθεια στη θάλασσα", roman: "Hriaázome voíthia sti thálasa", english: "I need help in the water" },
+    { greek: "Πού είναι ο ναυαγοσώστης;", roman: "Pu íne o navagoсóstis?", english: "Where is the lifeguard?" },
+    { greek: "Φοράς σωσίβιο;", roman: "Forás sosívio?", english: "Are you wearing a buoyancy aid?" },
+    { greek: "Πού μπορώ να ενοικιάσω εξοπλισμό;", roman: "Pu boró na enikáso exoplizmó?", english: "Where can I rent equipment?" },
+    { greek: "Πού είναι το kite school;", roman: "Pu íne to kite school?", english: "Where is the kite school?" },
+    { greek: "Η ζώνη ασφαλείας", roman: "I zóni asfalías", english: "The safety leash / harness" },
+    { greek: "Η ζώνη κινδύνου", roman: "I zóni kindínu", english: "The danger zone" },
+    { greek: "Προσοχή!", roman: "Prosohí!", english: "Watch out! / Be careful!" },
+    { greek: "Κράτα απόσταση!", roman: "Kráta apóstasi!", english: "Keep your distance!" },
+  ],
+  tip: "<strong>Προσοχή!</strong> and <strong>Κράτα απόσταση!</strong> are the two most important safety phrases on the beach. Learn them before anything else.",
+  quiz: [
+    { q: "Προσοχή!", opts: ["Keep distance!","Watch out!","I need help","The kite is stuck"], a: "Watch out!" },
+    { q: "Χρειάζομαι βοήθεια στη θάλασσα", opts: ["I need help in the water","The bar is broken","Where is the lifeguard?","I am stuck"], a: "I need help in the water" },
+    { q: "Πού μπορώ να ενοικιάσω εξοπλισμό;", opts: ["Where is the school?","Where can I rent equipment?","Where is the beach?","Where is the lifeguard?"], a: "Where can I rent equipment?" },
+    { q: "Κράτα απόσταση!", opts: ["Watch out!","Come closer!","Keep your distance!","Stop!"], a: "Keep your distance!" },
+  ]
+},
+
+// ══════════════════════════════════════
+//  WING FOILING
+// ══════════════════════════════════════
+{
+  cat: 5, title: "Talking Wing Foil", subtitle: "Discuss the sport with other riders",
+  phrases: [
+    { greek: "Κάνεις wing foil;", roman: "Kánis wing foil?", english: "Do you wing foil?" },
+    { greek: "Πόσο καιρό κάνεις wing;", roman: "Póso keró kánis wing?", english: "How long have you been winging?" },
+    { greek: "Πόσο μεγάλο είναι το wing σου;", roman: "Póso megálo íne to wing su?", english: "How big is your wing?" },
+    { greek: "Τι foil χρησιμοποιείς;", roman: "Ti foil hrisimopís?", english: "What foil do you use?" },
+    { greek: "Τι board χρησιμοποιείς;", roman: "Ti board hrisimopís?", english: "What board do you use?" },
+    { greek: "Πόσους κόμβους χρειάζεσαι για να σηκωθείς;", roman: "Pósos kómvus hriaázese ya na sikothís?", english: "How many knots do you need to get up on foil?" },
+    { greek: "Είναι εύκολο να μάθεις;", roman: "Íne éfkolo na máthis?", english: "Is it easy to learn?" },
+    { greek: "Πόσο διαρκεί να μάθεις;", roman: "Póso diarkí na máthis?", english: "How long does it take to learn?" },
+    { greek: "Έχω μάθει μόνος μου", roman: "Ého máthei mónos mu", english: "I taught myself" },
+    { greek: "Πήρα μαθήματα από εκπαιδευτή", roman: "Píra mathímata apó ekpedefтí", english: "I took lessons from an instructor" },
+    { greek: "Τρώω νερό συνέχεια!", roman: "Tróo neró sinéhia!", english: "I keep crashing / eating water!", note: "Literally 'I keep eating water' — a very natural expression" },
+    { greek: "Επιτέλους σηκώθηκα!", roman: "Epitélus sikóthika!", english: "I finally got up on foil!" },
+  ],
+  tip: "Wing foiling is booming in Greece. <strong>Τρώω νερό συνέχεια!</strong> ('I keep eating water!') will always get a laugh from other foilers — it is a universally relatable experience.",
+  quiz: [
+    { q: "Πόσο μεγάλο είναι το wing σου;", opts: ["How fast is your wing?","How big is your wing?","What brand is your wing?","How old is your wing?"], a: "How big is your wing?" },
+    { q: "Επιτέλους σηκώθηκα!", opts: ["I crashed again!","I finally got up on foil!","I gave up!","I need help!"], a: "I finally got up on foil!" },
+    { q: "Είναι εύκολο να μάθεις;", opts: ["Is it dangerous?","Is it easy to learn?","Is it expensive?","Is it fun?"], a: "Is it easy to learn?" },
+    { q: "Τρώω νερό συνέχεια!", opts: ["I love the water!","I keep crashing!","I am thirsty!","I am swimming!"], a: "I keep crashing!" },
+  ]
+},
+{
+  cat: 5, title: "Conditions & Spots", subtitle: "Find the best wind and water",
+  phrases: [
+    { greek: "Ποια είναι η καλύτερη παραλία για wing;", roman: "Pia íne i kalíteri paralía ya wing?", english: "Which is the best beach for winging?" },
+    { greek: "Πού φυσάει πιο συχνά;", roman: "Pu fisáei pio sihná?", english: "Where does the wind blow most often?" },
+    { greek: "Τι άνεμο έχει σήμερα;", roman: "Ti ánemo éhi símera?", english: "What wind is there today?" },
+    { greek: "Ο μελτέμι είναι δυνατός σήμερα", roman: "O meltémi íne ðinatós símera", english: "The meltemi is strong today", note: "Meltemi = the north wind dominant in the Aegean in summer" },
+    { greek: "Επικίνδυνες συνθήκες", roman: "Epikíndines sinthíkes", english: "Dangerous conditions" },
+    { greek: "Λίγο κυματισμό", roman: "Lígo kimatizmó", english: "Light chop / small waves" },
+    { greek: "Επίπεδο νερό", roman: "Epípedo neró", english: "Flat water" },
+    { greek: "Ρεύμα", roman: "Révma", english: "Current" },
+    { greek: "Αβαθή νερά", roman: "Avatí nerá", english: "Shallow water" },
+    { greek: "Βαθιά νερά", roman: "Vathiá nerá", english: "Deep water" },
+    { greek: "Πρόσεχε τις πέτρες / τα σκάφη", roman: "Prósehe tis pétres / ta skáfi", english: "Watch out for rocks / boats" },
+  ],
+  tip: "The <strong>Μελτέμι</strong> (meltemi) is the prevailing northerly wind in the Aegean — strongest in July and August, often 20–30 knots. Brilliant for wing foiling but it can build quickly. Always check the forecast.",
+  quiz: [
+    { q: "Επίπεδο νερό", opts: ["Deep water","Flat water","Strong current","Big waves"], a: "Flat water" },
+    { q: "Ο μελτέμι είναι δυνατός σήμερα", opts: ["The sea is calm today","The meltemi is strong today","The wind is from the south","No wind today"], a: "The meltemi is strong today" },
+    { q: "Ρεύμα", opts: ["Wave","Current","Wind","Tide"], a: "Current" },
+    { q: "Πρόσεχε τις πέτρες!", opts: ["Watch out for jellyfish!","Watch out for rocks!","Watch out for boats!","Watch out for swimmers!"], a: "Watch out for rocks!" },
+  ]
+},
+
+// ══════════════════════════════════════
+//  ICE BREAKERS
+// ══════════════════════════════════════
+{
+  cat: 6, title: "Starting a Conversation", subtitle: "Break the ice the Greek way",
+  phrases: [
+    { greek: "Είσαι από εδώ;", roman: "Íse apó eðó?", english: "Are you from here?" },
+    { greek: "Πόσο καιρό είσαι εδώ;", roman: "Póso keró íse eðó?", english: "How long have you been here?" },
+    { greek: "Σου αρέσει εδώ;", roman: "Su arési eðó?", english: "Do you like it here?" },
+    { greek: "Τι δουλειά κάνεις;", roman: "Ti ðuliá kánis?", english: "What do you do for work?", note: "One of the first questions Greeks ask" },
+    { greek: "Είσαι παντρεμένος / παντρεμένη;", roman: "Íse pandreménos / pandreméni?", english: "Are you married? (m/f)" },
+    { greek: "Έχεις παιδιά;", roman: "Éhis peðiá?", english: "Do you have children?" },
+    { greek: "Πού μένεις;", roman: "Pu ménis?", english: "Where do you live?" },
+    { greek: "Έχεις ξαναέρθει στην Ελλάδα;", roman: "Éhis xanaérthei stin Eláða?", english: "Have you been to Greece before?" },
+    { greek: "Πόσο καιρό μένεις;", roman: "Póso keró ménis?", english: "How long are you staying?" },
+    { greek: "Πού πας μετά;", roman: "Pu pas metá?", english: "Where are you going next?" },
+    { greek: "Σου αρέσει το ελληνικό φαγητό;", roman: "Su arési to elinikó fayitó?", english: "Do you like Greek food?" },
+    { greek: "Έχεις δοκιμάσει...;", roman: "Éhis dokimási...?", english: "Have you tried...?" },
+  ],
+  tip: "Greeks are naturally curious and ask personal questions very quickly — work, family, marital status. It is not intrusive, it is warmth. <strong>Τι δουλειά κάνεις;</strong> will come within the first five minutes of any conversation.",
+  quiz: [
+    { q: "Τι δουλειά κάνεις;", opts: ["Where do you live?","What do you do for work?","Are you married?","How long are you here?"], a: "What do you do for work?" },
+    { q: "Έχεις παιδιά;", opts: ["Are you married?","Do you have children?","Where are you from?","How old are you?"], a: "Do you have children?" },
+    { q: "Σου αρέσει εδώ;", opts: ["Are you from here?","How long are you here?","Do you like it here?","Where are you going?"], a: "Do you like it here?" },
+    { q: "Έχεις ξαναέρθει στην Ελλάδα;", opts: ["Do you like Greece?","Have you been to Greece before?","How long are you staying?","Where are you going next?"], a: "Have you been to Greece before?" },
+  ]
+},
+{
+  cat: 6, title: "Compliments & Banter", subtitle: "Greek warmth, compliments, and humour",
+  phrases: [
+    { greek: "Μιλάς πολύ καλά ελληνικά!", roman: "Milás polí kalá eliniká!", english: "You speak Greek very well!" },
+    { greek: "Είσαι πολύ καλός / καλή", roman: "Íse polí kalós / kalí", english: "You are very good (m/f)" },
+    { greek: "Τι ωραία μέρα!", roman: "Ti oréa méra!", english: "What a beautiful day!" },
+    { greek: "Τι ωραίο μέρος!", roman: "Ti oréo méros!", english: "What a beautiful place!" },
+    { greek: "Αγαπώ την Ελλάδα", roman: "Agapó tin Eláða", english: "I love Greece" },
+    { greek: "Ήρθα για την ηλιοθεραπεία", roman: "Írtha ya tin ilioterapía", english: "I came for the sunshine", note: "Always gets a laugh" },
+    { greek: "Ο καιρός είναι πάντα καλός εδώ;", roman: "O kerós íne pánda kalós eðó?", english: "Is the weather always this good here?" },
+    { greek: "Πώς λέγεται αυτό στα ελληνικά;", roman: "Pós léγete aftó sta eliniká?", english: "How do you say this in Greek?" },
+    { greek: "Τι σημαίνει αυτό;", roman: "Ti siméni aftó?", english: "What does that mean?" },
+    { greek: "Μου αρέσει πολύ η Ελλάδα", roman: "Mu arési polí i Eláða", english: "I really like Greece" },
+    { greek: "Θα επιστρέψω σίγουρα", roman: "Tha epistréfso síγura", english: "I will definitely come back" },
+    { greek: "Ωραία! / Τέλεια!", roman: "Oréa! / Télia!", english: "Great! / Perfect!", note: "Τέλεια is used constantly — the Greek equivalent of 'awesome'" },
+  ],
+  tip: "<strong>Τέλεια!</strong> is perhaps the most useful word for blending in — Greeks say it constantly. <strong>Πώς λέγεται αυτό στα ελληνικά;</strong> (how do you say this in Greek?) is the ultimate conversation-starter and Greeks will happily teach you words all evening.",
+  quiz: [
+    { q: "Τέλεια!", opts: ["Terrible!","Perfect!","Maybe!","Really?"], a: "Perfect!" },
+    { q: "Αγαπώ την Ελλάδα", opts: ["I miss Greece","I love Greece","I left Greece","I found Greece"], a: "I love Greece" },
+    { q: "Πώς λέγεται αυτό στα ελληνικά;", opts: ["What does this mean?","How do you say this in Greek?","Can you translate this?","What language is this?"], a: "How do you say this in Greek?" },
+    { q: "Θα επιστρέψω σίγουρα", opts: ["I will never come back","I will definitely come back","I just arrived","I am leaving tomorrow"], a: "I will definitely come back" },
+  ]
+},
+
+
+// ══════════════════════════════════════
+//  SENTENCE STRUCTURE  cat:7
+// ══════════════════════════════════════
+{
+  cat: 7,
+  title: "Sentence by Sentence",
+  subtitle: "20 real phrases from the course — taken apart word by word",
+  phrases: [],
+  breakdowns: [
+    {
+      phrase: "Γεια σου",
+      roman: "Ya su",
+      english: "Hello / Hi",
+      words: [
+        { greek: "Γεια", roman: "ya", meaning: "health — the wish you are giving" },
+        { greek: "σου", roman: "su", meaning: "your — possessive, follows the noun" },
+      ]
+    },
+    {
+      phrase: "Πώς είσαι;",
+      roman: "Pós íse?",
+      english: "How are you?",
+      words: [
+        { greek: "Πώς", roman: "pós", meaning: "how — question word, always first" },
+        { greek: "είσαι", roman: "íse", meaning: "you are — subject 'you' is built into the verb" },
+      ]
+    },
+    {
+      phrase: "Με λένε Φραντσέσκο",
+      roman: "Me léne Françesko",
+      english: "My name is Francesco",
+      words: [
+        { greek: "Με", roman: "me", meaning: "me — direct object pronoun" },
+        { greek: "λένε", roman: "léne", meaning: "they call — 3rd person plural, subject omitted" },
+        { greek: "Φραντσέσκο", roman: "Françesko", meaning: "Francesco — the name" },
+      ]
+    },
+    {
+      phrase: "Θέλω μία μπύρα",
+      roman: "Thélo mía bíra",
+      english: "I want a beer",
+      words: [
+        { greek: "Θέλω", roman: "thélo", meaning: "I want — subject 'I' built into the verb" },
+        { greek: "μία", roman: "mía", meaning: "a / one — feminine indefinite article" },
+        { greek: "μπύρα", roman: "bíra", meaning: "beer — feminine noun (μπ = B sound)" },
+      ]
+    },
+    {
+      phrase: "Τον λογαριασμό, παρακαλώ",
+      roman: "Ton logariazmó, parakaló",
+      english: "The bill, please",
+      words: [
+        { greek: "Τον", roman: "ton", meaning: "the — masculine accusative article (direct object)" },
+        { greek: "λογαριασμό", roman: "logariazmó", meaning: "bill — masculine noun, accusative ending -ό" },
+        { greek: "παρακαλώ", roman: "parakaló", meaning: "please — always goes at the end" },
+      ]
+    },
+    {
+      phrase: "Πού είναι η στάση;",
+      roman: "Pu íne i stási?",
+      english: "Where is the bus stop?",
+      words: [
+        { greek: "Πού", roman: "pu", meaning: "where — question word" },
+        { greek: "είναι", roman: "íne", meaning: "is" },
+        { greek: "η", roman: "i", meaning: "the — feminine article (στάση is feminine)" },
+        { greek: "στάση", roman: "stási", meaning: "bus stop — feminine noun" },
+      ]
+    },
+    {
+      phrase: "Πότε φεύγει το λεωφορείο;",
+      roman: "Póte févgi to leoforío?",
+      english: "When does the bus leave?",
+      words: [
+        { greek: "Πότε", roman: "póte", meaning: "when — time question word" },
+        { greek: "φεύγει", roman: "févgi", meaning: "leaves — 3rd person singular, subject in verb" },
+        { greek: "το", roman: "to", meaning: "the — neuter article (λεωφορείο is neuter)" },
+        { greek: "λεωφορείο", roman: "leoforío", meaning: "bus — neuter noun" },
+      ]
+    },
+    {
+      phrase: "Θέλω ένα κιλό ντομάτες",
+      roman: "Thélo éna kiló domátes",
+      english: "I want one kilo of tomatoes",
+      words: [
+        { greek: "Θέλω", roman: "thélo", meaning: "I want" },
+        { greek: "ένα", roman: "éna", meaning: "one — neuter article/number (κιλό is neuter)" },
+        { greek: "κιλό", roman: "kiló", meaning: "kilo — neuter noun" },
+        { greek: "ντομάτες", roman: "domátes", meaning: "tomatoes — plural (ντ = D sound)" },
+      ]
+    },
+    {
+      phrase: "Θέλω να στείλω αυτό το πακέτο",
+      roman: "Thélo na stílo aftó to pakéto",
+      english: "I want to send this parcel",
+      words: [
+        { greek: "Θέλω", roman: "thélo", meaning: "I want" },
+        { greek: "να", roman: "na", meaning: "to — connects two verbs, like English infinitive" },
+        { greek: "στείλω", roman: "stílo", meaning: "send — 1st person subjunctive after να" },
+        { greek: "αυτό", roman: "aftó", meaning: "this — neuter demonstrative pronoun" },
+        { greek: "το", roman: "to", meaning: "the — neuter article" },
+        { greek: "πακέτο", roman: "pakéto", meaning: "parcel — neuter noun" },
+      ]
+    },
+    {
+      phrase: "Δεν έχω τίποτα να δηλώσω",
+      roman: "Den ého típota na dilóso",
+      english: "I have nothing to declare",
+      words: [
+        { greek: "Δεν", roman: "den", meaning: "not — negation particle, always before the verb" },
+        { greek: "έχω", roman: "ého", meaning: "I have" },
+        { greek: "τίποτα", roman: "típota", meaning: "nothing — negative indefinite pronoun" },
+        { greek: "να", roman: "na", meaning: "to — subjunctive connector" },
+        { greek: "δηλώσω", roman: "dilóso", meaning: "declare — 1st person subjunctive" },
+      ]
+    },
+    {
+      phrase: "Θέλω να δηλώσω άφιξη",
+      roman: "Thélo na dilóso áfixis",
+      english: "I want to declare arrival",
+      words: [
+        { greek: "Θέλω", roman: "thélo", meaning: "I want" },
+        { greek: "να", roman: "na", meaning: "to — links the two verbs" },
+        { greek: "δηλώσω", roman: "dilóso", meaning: "declare — subjunctive of δηλώνω" },
+        { greek: "άφιξη", roman: "áfixis", meaning: "arrival — feminine noun, accusative" },
+      ]
+    },
+    {
+      phrase: "Το σκάφος μας βυθίζεται",
+      roman: "To skáfos mas vithízete",
+      english: "Our vessel is sinking",
+      words: [
+        { greek: "Το", roman: "to", meaning: "the — neuter article" },
+        { greek: "σκάφος", roman: "skáfos", meaning: "vessel / boat — neuter noun" },
+        { greek: "μας", roman: "mas", meaning: "our — possessive, comes AFTER the noun" },
+        { greek: "βυθίζεται", roman: "vithízete", meaning: "is sinking — passive/reflexive form" },
+      ]
+    },
+    {
+      phrase: "Πόσο μεγάλος είναι ο αετός σου;",
+      roman: "Póso megálos íne o aetós su?",
+      english: "How big is your kite?",
+      words: [
+        { greek: "Πόσο", roman: "póso", meaning: "how — quantity/degree question word" },
+        { greek: "μεγάλος", roman: "megálos", meaning: "big — masculine adjective, agrees with ο αετός" },
+        { greek: "είναι", roman: "íne", meaning: "is" },
+        { greek: "ο", roman: "o", meaning: "the — masculine article" },
+        { greek: "αετός", roman: "aetós", meaning: "kite — masculine noun (literally eagle)" },
+        { greek: "σου", roman: "su", meaning: "your — possessive, follows the noun" },
+      ]
+    },
+    {
+      phrase: "Χρειάζομαι βοήθεια στη θάλασσα",
+      roman: "Hriaázome voíthia sti thálasa",
+      english: "I need help in the water",
+      words: [
+        { greek: "Χρειάζομαι", roman: "hriaázome", meaning: "I need — passive form with active meaning" },
+        { greek: "βοήθεια", roman: "voíthia", meaning: "help — feminine noun" },
+        { greek: "στη", roman: "sti", meaning: "in the — σε + τη merged (feminine before consonant)" },
+        { greek: "θάλασσα", roman: "thálasa", meaning: "sea / water — feminine noun" },
+      ]
+    },
+    {
+      phrase: "Πόσο καιρό κάνεις wing;",
+      roman: "Póso keró kánis wing?",
+      english: "How long have you been winging?",
+      words: [
+        { greek: "Πόσο", roman: "póso", meaning: "how much / how long" },
+        { greek: "καιρό", roman: "keró", meaning: "time — accusative of καιρός (masculine)" },
+        { greek: "κάνεις", roman: "kánis", meaning: "do you do / have you been doing — 2nd person" },
+        { greek: "wing", roman: "wing", meaning: "wing foiling — English word used as-is" },
+      ]
+    },
+    {
+      phrase: "Ο μελτέμι είναι δυνατός σήμερα",
+      roman: "O meltémi íne ðinatós símera",
+      english: "The meltemi is strong today",
+      words: [
+        { greek: "Ο", roman: "o", meaning: "the — masculine article" },
+        { greek: "μελτέμι", roman: "meltémi", meaning: "meltemi — the Aegean northerly wind" },
+        { greek: "είναι", roman: "íne", meaning: "is" },
+        { greek: "δυνατός", roman: "ðinatós", meaning: "strong — masculine adjective, agrees with ο μελτέμι" },
+        { greek: "σήμερα", roman: "símera", meaning: "today" },
+      ]
+    },
+    {
+      phrase: "Τι δουλειά κάνεις;",
+      roman: "Ti ðuliá kánis?",
+      english: "What do you do for work?",
+      words: [
+        { greek: "Τι", roman: "ti", meaning: "what — question word" },
+        { greek: "δουλειά", roman: "ðuliá", meaning: "work / job — feminine noun, accusative" },
+        { greek: "κάνεις", roman: "kánis", meaning: "do you do — 2nd person singular of κάνω" },
+      ]
+    },
+    {
+      phrase: "Σου αρέσει εδώ;",
+      roman: "Su arési eðó?",
+      english: "Do you like it here?",
+      words: [
+        { greek: "Σου", roman: "su", meaning: "to you — indirect object pronoun, comes first" },
+        { greek: "αρέσει", roman: "arési", meaning: "does it please — literally 'is it pleasing to you'" },
+        { greek: "εδώ", roman: "eðó", meaning: "here" },
+      ]
+    },
+    {
+      phrase: "Μιλάς πολύ καλά ελληνικά!",
+      roman: "Milás polí kalá eliniká!",
+      english: "You speak Greek very well!",
+      words: [
+        { greek: "Μιλάς", roman: "milás", meaning: "you speak — 2nd person singular, subject built in" },
+        { greek: "πολύ", roman: "polí", meaning: "very — intensifier before adverb" },
+        { greek: "καλά", roman: "kalá", meaning: "well — adverb (not καλός which is adjective)" },
+        { greek: "ελληνικά", roman: "eliniká", meaning: "Greek language — adverbial accusative" },
+      ]
+    },
+    {
+      phrase: "Πού μπορώ να δέσω;",
+      roman: "Pu boró na déso?",
+      english: "Where can I berth / moor?",
+      words: [
+        { greek: "Πού", roman: "pu", meaning: "where — question word" },
+        { greek: "μπορώ", roman: "boró", meaning: "can I — 1st person of μπορώ (I can)" },
+        { greek: "να", roman: "na", meaning: "to — subjunctive connector after μπορώ" },
+        { greek: "δέσω", roman: "déso", meaning: "moor / tie up — 1st person subjunctive of δένω" },
+      ]
+    },
+  ],
+  tip: "Three patterns you will see in almost every sentence: <strong>να + verb</strong> = to do something (θέλω να πάω = I want to go) · <strong>Δεν + verb</strong> = negation (δεν έχω = I don't have) · <strong>possessive after noun</strong> (ο αετός σου = your kite, literally the kite your).",
+  quiz: [
+    { q: "Να connects...", opts: ["two nouns","two verbs like to","a question","past tense"], a: "two verbs like to" },
+    { q: "In 'ο αετός σου', σου means...", opts: ["my","his","your — after the noun","our"], a: "your — after the noun" },
+    { q: "Δεν goes...", opts: ["after the verb","before the verb","at the end","in the middle"], a: "before the verb" },
+    { q: "Σου αρέσει means literally...", opts: ["You like it","It pleases you","Do you want it","You enjoy it"], a: "It pleases you" },
+  ]
+},
+
+// ══════════════════════════════════════
+//  GRAMMAR  cat:8
+// ══════════════════════════════════════
+{
+  cat: 8,
+  title: "The Articles",
+  subtitle: "ο, η, το — masculine, feminine, neuter",
+  phrases: [],
+  vocabGroups: [
+    {
+      title: "The three definite articles — the",
+      items: [
+        { greek: "ο άνδρας", roman: "o ándras", english: "the man — masculine → ο" },
+        { greek: "η γυναίκα", roman: "i yinéka", english: "the woman — feminine → η" },
+        { greek: "το παιδί", roman: "to peðí", english: "the child — neuter → το" },
+        { greek: "ο καιρός", roman: "o kerós", english: "the weather — masculine → ο" },
+        { greek: "η θάλασσα", roman: "i thálasa", english: "the sea — feminine → η" },
+        { greek: "το σκάφος", roman: "to skáfos", english: "the boat — neuter → το" },
+        { greek: "ο άνεμος", roman: "o ánemos", english: "the wind — masculine → ο" },
+        { greek: "η παραλία", roman: "i paralía", english: "the beach — feminine → η" },
+        { greek: "το λιμάνι", roman: "to limáni", english: "the harbour — neuter → το" },
+      ]
+    },
+    {
+      title: "Articles change with function (case)",
+      items: [
+        { greek: "ο καφές → τον καφέ", roman: "o kafés → ton kafé", english: "the coffee (subject → object) — τον when receiving the action" },
+        { greek: "η στάση → στην στάση", roman: "i stási → stin stási", english: "the stop → at the stop — σε + την = στην" },
+        { greek: "το λιμάνι → στο λιμάνι", roman: "to limáni → sto limáni", english: "the harbour → to the harbour — σε + το = στο" },
+      ]
+    }
+  ],
+  tip: "A simple trick: most nouns ending in <strong>-ος</strong> are masculine (ο) · most ending in <strong>-η</strong> or <strong>-α</strong> are feminine (η) · most ending in <strong>-ο</strong> or <strong>-ι</strong> are neuter (το). Not a perfect rule but works for most common words.",
+  quiz: [
+    { q: "η θάλασσα — the article η means...", opts: ["masculine","feminine","neuter","plural"], a: "feminine" },
+    { q: "σε + το = ?", opts: ["στον","στην","στο","στα"], a: "στο" },
+    { q: "ο καιρός — the article ο means...", opts: ["masculine","feminine","neuter","plural"], a: "masculine" },
+    { q: "σε + την = ?", opts: ["στον","στην","στο","στα"], a: "στην" },
+  ]
+},
+{
+  cat: 8,
+  title: "Verbs",
+  subtitle: "How Greek verbs work — subject built in, tenses, negation",
+  phrases: [],
+  vocabGroups: [
+    {
+      title: "Subject is built into the verb ending",
+      items: [
+        { greek: "μιλ-ώ", roman: "mil-ó", english: "I speak — ώ ending = I" },
+        { greek: "μιλ-άς", roman: "mil-ás", english: "you speak — άς ending = you" },
+        { greek: "μιλ-ά", roman: "mil-á", english: "he/she speaks — ά ending = he/she" },
+        { greek: "μιλ-άμε", roman: "mil-áme", english: "we speak — άμε ending = we" },
+        { greek: "μιλ-άτε", roman: "mil-áte", english: "you speak (plural) — άτε ending = you all" },
+        { greek: "μιλ-άνε", roman: "mil-áne", english: "they speak — άνε ending = they" },
+      ]
+    },
+    {
+      title: "Making tenses",
+      items: [
+        { greek: "Μιλώ ελληνικά", roman: "miló eliniká", english: "I speak Greek — present tense" },
+        { greek: "Θα μιλώ ελληνικά", roman: "tha miló eliniká", english: "I will speak Greek — add Θα for future" },
+        { greek: "Δεν μιλώ ελληνικά", roman: "den miló eliniká", english: "I do not speak Greek — add Δεν for negative" },
+        { greek: "Μίλησα ελληνικά", roman: "mílisa eliniká", english: "I spoke Greek — past tense (stem changes)" },
+      ]
+    },
+    {
+      title: "The να connector — to do something",
+      items: [
+        { greek: "Θέλω να πάω", roman: "thélo na páo", english: "I want to go — Θέλω (I want) + να + verb" },
+        { greek: "Μπορώ να έρθω", roman: "boró na értho", english: "I can come — Μπορώ (I can) + να + verb" },
+        { greek: "Πρέπει να φύγω", roman: "prépi na fígo", english: "I must leave — Πρέπει (must) + να + verb" },
+        { greek: "Θέλω να στείλω", roman: "thélo na stílo", english: "I want to send — same pattern every time" },
+      ]
+    }
+  ],
+  tip: "The three most useful verb rules: <strong>1)</strong> Never say the subject pronoun — it is in the verb ending. <strong>2)</strong> Put <strong>Θα</strong> before any verb to make it future. <strong>3)</strong> Put <strong>Δεν</strong> before any verb to make it negative. These three rules alone let you build hundreds of sentences.",
+  quiz: [
+    { q: "Θα + verb makes...", opts: ["past tense","negative","future tense","a question"], a: "future tense" },
+    { q: "Δεν + verb makes...", opts: ["future","question","negative","polite request"], a: "negative" },
+    { q: "Θέλω να πάω means...", opts: ["I went","I want to go","I am going","I went to"], a: "I want to go" },
+    { q: "The -άς ending means the subject is...", opts: ["I","you","he/she","we"], a: "you" },
+  ]
+},
+{
+  cat: 8,
+  title: "Adjectives & Possessives",
+  subtitle: "Agreement, word order, and how to say my/your/our",
+  phrases: [],
+  vocabGroups: [
+    {
+      title: "Adjectives agree with the noun — καλός/καλή/καλό",
+      items: [
+        { greek: "ο καλός καιρός", roman: "o kalós kerós", english: "the good weather — masculine → καλός" },
+        { greek: "η καλή θάλασσα", roman: "i kalí thálasa", english: "the good/calm sea — feminine → καλή" },
+        { greek: "το καλό φαγητό", roman: "to kaló fayitó", english: "the good food — neuter → καλό" },
+        { greek: "ο δυνατός άνεμος", roman: "o ðinatós ánemos", english: "the strong wind — masculine → δυνατός" },
+        { greek: "η δυνατή βροχή", roman: "i ðinatí vrohí", english: "the strong rain — feminine → δυνατή" },
+        { greek: "το δυνατό κύμα", roman: "to ðinató kíma", english: "the strong wave — neuter → δυνατό" },
+      ]
+    },
+    {
+      title: "Possessives — always AFTER the noun",
+      items: [
+        { greek: "το σκάφος μου", roman: "to skáfos mu", english: "my boat — μου (my) after noun" },
+        { greek: "το σκάφος σου", roman: "to skáfos su", english: "your boat — σου (your) after noun" },
+        { greek: "το σκάφος του", roman: "to skáfos tu", english: "his boat — του (his) after noun" },
+        { greek: "το σκάφος μας", roman: "to skáfos mas", english: "our boat — μας (our) after noun" },
+        { greek: "η μητέρα σου", roman: "i mitéra su", english: "your mother — σου after noun" },
+        { greek: "ο αετός σου", roman: "o aetós su", english: "your kite — σου after noun" },
+      ]
+    }
+  ],
+  tip: "English says <em>my boat</em> — Greek says <em>το σκάφος μου</em> (the boat my). The possessive always comes <strong>after</strong> the noun in Greek. This applies to all possessives: μου (my) · σου (your) · του/της (his/her) · μας (our) · σας (your plural) · τους (their).",
+  quiz: [
+    { q: "το σκάφος μας means...", opts: ["my boat","your boat","his boat","our boat"], a: "our boat" },
+    { q: "In Greek, possessives go...", opts: ["before the noun","after the article","after the noun","before the verb"], a: "after the noun" },
+    { q: "ο δυνατός άνεμος — why δυνατός not δυνατή?", opts: ["Random choice","άνεμος is masculine","άνεμος is feminine","It is neuter"], a: "άνεμος is masculine" },
+    { q: "η μητέρα σου means...", opts: ["my mother","his mother","your mother","our mother"], a: "your mother" },
+  ]
+},
+]; // end lessons
+
+// ─── Build UI ──────────────────────────────────────────────
+let currentCat = 0;
+let currentLesson = 0;
+const quizState = {};
+
+const catNavEl = document.getElementById('catNav');
+const lessonNavEl = document.getElementById('lessonNav');
+const container = document.getElementById('lessonsContainer');
+
+cats.forEach((c, ci) => {
+  const btn = document.createElement('button');
+  btn.className = 'cat-btn' + (ci === 0 ? ' active' : '');
+  btn.textContent = c.icon + ' ' + c.name;
+  btn.onclick = () => selectCat(ci);
+  catNavEl.appendChild(btn);
+});
+
+function selectCat(ci) {
+  currentCat = ci;
+  document.querySelectorAll('.cat-btn').forEach((b, i) => b.classList.toggle('active', i === ci));
+  buildLessonNav(ci);
+  const first = lessons.findIndex(l => l.cat === ci);
+  if (first >= 0) showLesson(first);
+}
+
+function buildLessonNav(ci) {
+  lessonNavEl.innerHTML = '';
+  lessons.forEach((l, i) => {
+    if (l.cat !== ci) return;
+    const btn = document.createElement('button');
+    btn.className = 'lesson-pill' + (i === currentLesson ? ' active' : '');
+    btn.textContent = l.title;
+    btn.dataset.idx = i;
+    btn.onclick = () => showLesson(i);
+    lessonNavEl.appendChild(btn);
+  });
+}
+
+function updateLessonNav() {
+  lessonNavEl.querySelectorAll('.lesson-pill').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.idx) === currentLesson);
+  });
+  const active = lessonNavEl.querySelector('.lesson-pill.active');
+  if (active) active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+}
+
+// ── TTS Configuration ──────────────────────────────────
+// After deploying your Cloudflare Worker, replace the URL below
+// with your own Worker URL (e.g. https://greek-tts-proxy.xyz.workers.dev)
+const TTS_WORKER_URL = 'YOUR_WORKER_URL_HERE';
+
+// Audio cache — avoids re-fetching the same phrase
+const audioCache = {};
+let currentAudio = null;
+
+function stopCurrentAudio() {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+}
+
+function setButtonState(btn, state) {
+  document.querySelectorAll('.speak-btn.playing').forEach(b => {
+    b.classList.remove('playing');
+    b.textContent = '🔊';
+  });
+  if (btn && state === 'playing') {
+    btn.classList.add('playing');
+    btn.textContent = '⏸';
+  }
+  if (btn && state === 'loading') {
+    btn.textContent = '⏳';
+  }
+}
+
+async function speak(text, btn) {
+  stopCurrentAudio();
+
+  // If no Worker URL set yet, fall back to browser TTS
+  if (!TTS_WORKER_URL || TTS_WORKER_URL === 'YOUR_WORKER_URL_HERE') {
+    speakFallback(text, btn);
+    return;
+  }
+
+  setButtonState(btn, 'loading');
+
+  try {
+    // Check cache first
+    let audioBase64 = audioCache[text];
+
+    if (!audioBase64) {
+      const res = await fetch(TTS_WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+
+      if (!res.ok) throw new Error('Worker returned ' + res.status);
+      const data = await res.json();
+      audioBase64 = data.audio;
+      audioCache[text] = audioBase64; // cache it
+    }
+
+    // Decode base64 MP3 and play
+    const audioSrc = 'data:audio/mp3;base64,' + audioBase64;
+    const audio = new Audio(audioSrc);
+    currentAudio = audio;
+
+    setButtonState(btn, 'playing');
+
+    audio.onended = () => setButtonState(btn, 'idle');
+    audio.onerror = () => {
+      setButtonState(btn, 'idle');
+      speakFallback(text, btn); // fallback if audio fails
+    };
+
+    await audio.play();
+
+  } catch (err) {
+    console.warn('TTS Worker failed, using browser fallback:', err);
+    setButtonState(btn, 'idle');
+    speakFallback(text, btn);
+  }
+}
+
+// Browser TTS fallback (used if Worker not configured or fails)
+function speakFallback(text, btn) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'el-GR';
+  utt.rate = 0.82;
+  const voices = window.speechSynthesis.getVoices();
+  const greek = voices.find(v => v.lang && v.lang.startsWith('el'));
+  if (greek) utt.voice = greek;
+  if (btn) {
+    setButtonState(btn, 'playing');
+    utt.onend = () => setButtonState(btn, 'idle');
+    utt.onerror = () => setButtonState(btn, 'idle');
+  }
+  window.speechSynthesis.speak(utt);
+}
+
+function safe(str) { return (str||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+
+function mkPhrase(p) {
+  const d = document.createElement('div');
+  d.className = 'phrase-card';
+  d.innerHTML = `
+    <div class="phrase-body">
+      <div class="phrase-greek">${p.greek}</div>
+      <div class="phrase-roman">${p.roman}</div>
+      <div class="phrase-english">${p.english}</div>
+      ${p.note ? `<div class="phrase-note">${p.note}</div>` : ''}
+    </div>
+    <button class="speak-btn" onclick="speak('${safe(p.greek)}',this)">🔊</button>
+  `;
+  return d;
+}
+
+function mkVocabGroup(vg) {
+  const wrap = document.createElement('div');
+  const card = document.createElement('div');
+  card.className = 'vocab-group';
+  let inner = `<div class="vocab-group-title">${vg.title}</div>`;
+  vg.items.forEach(item => {
+    inner += `
+      <div class="vocab-item">
+        <div class="vocab-body">
+          <div class="vocab-greek">${item.greek}</div>
+          <div class="vocab-roman">${item.roman}</div>
+          <div class="vocab-english">${item.english}</div>
+        </div>
+        <button class="speak-btn speak-btn-sm" onclick="speak('${safe(item.greek)}',this)">🔊</button>
+      </div>
+    `;
+  });
+  card.innerHTML = inner;
+  wrap.appendChild(card);
+  return wrap;
+}
+
+function mkBreakdown(b) {
+  const wrap = document.createElement('div');
+  const lbl = document.createElement('div'); lbl.className = 'section-hd'; lbl.textContent = b.english;
+  wrap.appendChild(lbl);
+  const card = document.createElement('div'); card.className = 'breakdown-card';
+  card.innerHTML = `
+    <div class="breakdown-phrase-row">
+      <div class="breakdown-full-greek">${b.phrase}</div>
+      <button class="speak-btn" style="width:38px;height:38px;font-size:16px" onclick="speak('${safe(b.phrase)}',this)">🔊</button>
+    </div>
+    <div class="breakdown-english-label">${b.english}</div>
+    <div class="bd-row bd-header"><div class="bd-cell">Greek</div><div class="bd-cell">Pronunciation</div><div class="bd-cell">Meaning</div></div>
+    ${b.words.map(w=>`<div class="bd-row"><div class="bd-cell greek">${w.greek}</div><div class="bd-cell roman">${w.roman}</div><div class="bd-cell">${w.meaning}</div></div>`).join('')}
+  `;
+  wrap.appendChild(card);
+  return wrap;
+}
+
+function mkFormRef(fr) {
+  const wrap = document.createElement('div');
+  const lbl = document.createElement('div'); lbl.className = 'section-hd'; lbl.textContent = 'Form Reference';
+  wrap.appendChild(lbl);
+  const card = document.createElement('div'); card.className = 'field-ref';
+  card.innerHTML = `<div class="field-ref-header">${fr.title}</div>` +
+    fr.fields.map(f=>`<div class="field-row"><div class="field-label-en">${f.en}</div><div><div class="field-label-gr">${f.greek}</div><div class="field-roman">${f.roman}</div></div></div>`).join('');
+  wrap.appendChild(card);
+  return wrap;
+}
+
+function mkQuiz(li, qd) {
+  if (!qd || !qd.length) return null;
+  if (!quizState[li]) quizState[li] = { cur: 0, score: 0, answered: false };
+  const card = document.createElement('div'); card.className = 'quiz-card'; card.id = `quiz-${li}`;
+  renderQuiz(card, li, qd);
+  return card;
+}
+
+function renderQuiz(card, li, qd) {
+  const s = quizState[li]; const q = qd[s.cur]; const total = qd.length;
+  card.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
+      <div class="quiz-label">Quick Quiz</div>
+      <div class="quiz-score">${s.cur+1} / ${total} · Score: ${s.score}</div>
+    </div>
+    <div class="quiz-q">${q.q}</div>
+    <div class="quiz-opts" id="qo-${li}"></div>
+    <div class="quiz-fb" id="qf-${li}"></div>
+    <div class="quiz-actions">
+      <button class="btn-ghost" onclick="resetQuiz(${li})">Restart</button>
+      <button class="btn-primary" id="qn-${li}" style="display:none" onclick="nextQ(${li})">${s.cur < total-1 ? 'Next →' : 'Finish'}</button>
+    </div>
+  `;
+  const opts = card.querySelector(`#qo-${li}`);
+  q.opts.forEach(opt => {
+    const b = document.createElement('button'); b.className = 'quiz-opt'; b.textContent = opt;
+    b.onclick = () => answerQ(li, qd, opt, q.a);
+    opts.appendChild(b);
+  });
+}
+
+function answerQ(li, qd, chosen, correct) {
+  const s = quizState[li]; if (s.answered) return; s.answered = true;
+  const fb = document.getElementById(`qf-${li}`); const nn = document.getElementById(`qn-${li}`);
+  document.querySelectorAll(`#qo-${li} .quiz-opt`).forEach(b => {
+    b.disabled = true;
+    if (b.textContent === correct) b.classList.add('correct');
+    else if (b.textContent === chosen) b.classList.add('wrong');
+  });
+  if (chosen === correct) { s.score++; fb.textContent = '✓ Correct!'; fb.style.color = 'var(--green)'; }
+  else { fb.textContent = `✗ Answer: ${correct}`; fb.style.color = 'var(--red)'; }
+  if (nn) nn.style.display = 'inline-block';
+}
+
+function nextQ(li) {
+  const s = quizState[li]; const qd = lessons[li].quiz; s.cur++; s.answered = false;
+  const card = document.getElementById(`quiz-${li}`);
+  if (s.cur >= qd.length) {
+    const pct = Math.round(s.score / qd.length * 100);
+    card.innerHTML = `
+      <div class="quiz-label">Quiz Complete!</div>
+      <div style="font-size:48px;font-weight:700;color:var(--label);margin:12px 0;letter-spacing:-1px">${s.score}<span style="font-size:24px;color:var(--label3)">/${qd.length}</span></div>
+      <div style="font-size:16px;color:var(--label2);margin-bottom:16px">${pct===100?'Perfect! 🎉':pct>=75?'Great job!':pct>=50?'Good — review and try again.':'Keep studying the phrases above.'}</div>
+      <button class="btn-ghost" onclick="resetQuiz(${li})">Try Again</button>
+    `;
+  } else { renderQuiz(card, li, qd); }
+}
+
+function resetQuiz(li) {
+  quizState[li] = { cur: 0, score: 0, answered: false };
+  renderQuiz(document.getElementById(`quiz-${li}`), li, lessons[li].quiz);
+}
+
+// ── Reverse Quiz: English → Greek ─────────────────────────
+const rquizState = {};
+
+function makeReverseQuiz(qd) {
+  // Flip each question: English answer becomes the question, Greek becomes the answer
+  return qd.map((item, idx) => {
+    const wrongOpts = qd
+      .filter((_, i) => i !== idx)
+      .map(x => x.q)
+      .slice(0, 3);
+    const opts = [...wrongOpts, item.q].sort(() => Math.random() - 0.5);
+    return { q: item.a, opts, a: item.q };
+  });
+}
+
+function mkRQuiz(li, qd) {
+  if (!qd || !qd.length) return null;
+  const rqd = makeReverseQuiz(qd);
+  if (!rquizState[li]) rquizState[li] = { cur: 0, score: 0, answered: false, data: rqd };
+  else rquizState[li].data = rqd;
+  const card = document.createElement('div');
+  card.className = 'quiz-card';
+  card.id = `rquiz-${li}`;
+  renderRQuiz(card, li);
+  return card;
+}
+
+function renderRQuiz(card, li) {
+  const s = rquizState[li];
+  const qd = s.data;
+  const q = qd[s.cur];
+  const total = qd.length;
+  card.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
+      <div class="quiz-label" style="color:var(--orange)">English → Greek</div>
+      <div class="quiz-score">${s.cur+1} / ${total} · Score: ${s.score}</div>
+    </div>
+    <div class="quiz-q" style="font-size:20px;color:var(--label2)">${q.q}</div>
+    <div class="quiz-opts" id="rqo-${li}"></div>
+    <div class="quiz-fb" id="rqf-${li}"></div>
+    <div class="quiz-actions">
+      <button class="btn-ghost" onclick="resetRQuiz(${li})">Restart</button>
+      <button class="btn-primary" id="rqn-${li}" style="display:none" onclick="nextRQ(${li})">${s.cur < total-1 ? 'Next →' : 'Finish'}</button>
+    </div>
+  `;
+  const opts = card.querySelector(`#rqo-${li}`);
+  q.opts.forEach(opt => {
+    const b = document.createElement('button');
+    b.className = 'quiz-opt';
+    b.style.fontFamily = 'var(--font)';
+    b.style.fontSize = '17px';
+    b.textContent = opt;
+    b.onclick = () => answerRQ(li, opt, q.a);
+    opts.appendChild(b);
+  });
+}
+
+function answerRQ(li, chosen, correct) {
+  const s = rquizState[li]; if (s.answered) return; s.answered = true;
+  const fb = document.getElementById(`rqf-${li}`);
+  const nn = document.getElementById(`rqn-${li}`);
+  document.querySelectorAll(`#rqo-${li} .quiz-opt`).forEach(b => {
+    b.disabled = true;
+    if (b.textContent === correct) b.classList.add('correct');
+    else if (b.textContent === chosen) b.classList.add('wrong');
+  });
+  if (chosen === correct) { s.score++; fb.textContent = '✓ Correct!'; fb.style.color = 'var(--green)'; }
+  else { fb.textContent = `✗ Answer: ${correct}`; fb.style.color = 'var(--red)'; }
+  if (nn) nn.style.display = 'inline-block';
+}
+
+function nextRQ(li) {
+  const s = rquizState[li]; s.cur++; s.answered = false;
+  const card = document.getElementById(`rquiz-${li}`);
+  if (s.cur >= s.data.length) {
+    const pct = Math.round(s.score / s.data.length * 100);
+    card.innerHTML = `
+      <div class="quiz-label" style="color:var(--orange)">English → Greek Complete!</div>
+      <div style="font-size:48px;font-weight:700;color:var(--label);margin:12px 0;letter-spacing:-1px">${s.score}<span style="font-size:24px;color:var(--label3)">/${s.data.length}</span></div>
+      <div style="font-size:16px;color:var(--label2);margin-bottom:16px">${pct===100?'Perfect! 🎉':pct>=75?'Great job!':pct>=50?'Good — keep practising.':'Review the phrases and try again.'}</div>
+      <button class="btn-ghost" onclick="resetRQuiz(${li})">Try Again</button>
+    `;
+  } else { renderRQuiz(card, li); }
+}
+
+function resetRQuiz(li) {
+  const rqd = makeReverseQuiz(lessons[li].quiz);
+  rquizState[li] = { cur: 0, score: 0, answered: false, data: rqd };
+  renderRQuiz(document.getElementById(`rquiz-${li}`), li);
+}
+
+function showLesson(idx) {
+  currentLesson = idx;
+  document.querySelectorAll('.lesson').forEach((l, i) => l.classList.toggle('active', i === idx));
+  updateLessonNav();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Alphabet table data ───────────────────────────────
+const alphabetRows = [
+  { upper: "Α", lower: "α", latin: "A", note: "As in father" },
+  { upper: "Β", lower: "β", latin: "V", note: "⚠️ Always V as in very — never B" },
+  { upper: "Γ", lower: "γ", latin: "Y / GH", note: "Soft — like yes before e/i, like loch elsewhere" },
+  { upper: "Δ", lower: "δ", latin: "TH", note: "⚠️ TH as in this — never D" },
+  { upper: "Ε", lower: "ε", latin: "E", note: "Short E as in bed" },
+  { upper: "Ζ", lower: "ζ", latin: "Z", note: "As in zoo" },
+  { upper: "Η", lower: "η", latin: "I", note: "As in feel — same sound as ι and υ" },
+  { upper: "Θ", lower: "θ", latin: "TH", note: "TH as in think (unvoiced)" },
+  { upper: "Ι", lower: "ι", latin: "I", note: "As in feel" },
+  { upper: "Κ", lower: "κ", latin: "K", note: "As in key" },
+  { upper: "Λ", lower: "λ", latin: "L", note: "As in love" },
+  { upper: "Μ", lower: "μ", latin: "M", note: "As in mother" },
+  { upper: "Ν", lower: "ν", latin: "N", note: "As in no" },
+  { upper: "Ξ", lower: "ξ", latin: "X", note: "As in box — always KS sound" },
+  { upper: "Ο", lower: "ο", latin: "O", note: "Short O as in off — same sound as ω" },
+  { upper: "Π", lower: "π", latin: "P", note: "As in pie" },
+  { upper: "Ρ", lower: "ρ", latin: "R", note: "Rolled R — like Spanish pero" },
+  { upper: "Σ", lower: "σ / ς", latin: "S", note: "⚠️ σ at start/middle of word · ς at end of word only" },
+  { upper: "Τ", lower: "τ", latin: "T", note: "As in top" },
+  { upper: "Υ", lower: "υ", latin: "I", note: "As in feel — same sound as η and ι" },
+  { upper: "Φ", lower: "φ", latin: "F", note: "⚠️ Always F as in phone — never P" },
+  { upper: "Χ", lower: "χ", latin: "KH", note: "⚠️ Soft guttural — like loch or Bach, not CH as in church" },
+  { upper: "Ψ", lower: "ψ", latin: "PS", note: "As in lapse — always PS even at start of word" },
+  { upper: "Ω", lower: "ω", latin: "O", note: "Same sound as ο — no difference in modern Greek" },
+];
+
+// Common combinations
+const comboRows = [
+  { upper: "ΑΙ", lower: "αι", latin: "E", note: "As in bed" },
+  { upper: "ΕΙ", lower: "ει", latin: "I", note: "As in feel" },
+  { upper: "ΟΙ", lower: "οι", latin: "I", note: "As in feel" },
+  { upper: "ΟΥ", lower: "ου", latin: "OO", note: "As in food — e.g. σου = su" },
+  { upper: "ΑΥ", lower: "αυ", latin: "AV / AF", note: "AV before vowels/voiced consonants · AF before unvoiced" },
+  { upper: "ΜΠ", lower: "μπ", latin: "B", note: "B at start of word — e.g. μπύρα = bíra (beer)" },
+  { upper: "ΝΤ", lower: "ντ", latin: "D / ND", note: "D at start · ND in middle — e.g. ντομάτα = domáta" },
+  { upper: "ΓΚ", lower: "γκ", latin: "G", note: "Hard G as in go" },
+  { upper: "ΤΣ", lower: "τσ", latin: "TS", note: "As in bits — e.g. τσάι = tsái (tea)" },
+  { upper: "ΤΖ", lower: "τζ", latin: "DZ / J", note: "As in jazz — e.g. τζατζίκι = tzatziki" },
+];
+
+function mkAlphabetTable() {
+  const wrap = document.createElement('div');
+
+  // Main alphabet
+  const lbl1 = document.createElement('div'); lbl1.className = 'section-hd'; lbl1.textContent = 'The 24 Letters';
+  wrap.appendChild(lbl1);
+
+  const t1 = document.createElement('div'); t1.className = 'alpha-table';
+  // Header
+  const hdr = document.createElement('div'); hdr.className = 'alpha-header';
+  ['Upper','Lower','Sound','Notes',''].forEach(h => {
+    const c = document.createElement('div'); c.className = 'alpha-cell'; c.textContent = h; hdr.appendChild(c);
+  });
+  t1.appendChild(hdr);
+
+  alphabetRows.forEach(row => {
+    const r = document.createElement('div'); r.className = 'alpha-row';
+    r.innerHTML = `
+      <div class="alpha-cell alpha-upper">${row.upper}</div>
+      <div class="alpha-cell alpha-lower">${row.lower}</div>
+      <div class="alpha-cell alpha-latin">${row.latin}</div>
+      <div class="alpha-cell alpha-note">${row.note}</div>
+      <div class="alpha-cell" style="padding:6px 4px">
+        <button class="alpha-speak" onclick="speak('${row.upper.split('/')[0].trim()}',this)" title="Pronounce">🔊</button>
+      </div>
+    `;
+    t1.appendChild(r);
+  });
+  wrap.appendChild(t1);
+
+  // Combinations
+  const lbl2 = document.createElement('div'); lbl2.className = 'section-hd'; lbl2.textContent = 'Common Combinations';
+  wrap.appendChild(lbl2);
+
+  const t2 = document.createElement('div'); t2.className = 'alpha-table';
+  const hdr2 = document.createElement('div'); hdr2.className = 'alpha-header';
+  ['Upper','Lower','Sound','Notes',''].forEach(h => {
+    const c = document.createElement('div'); c.className = 'alpha-cell'; c.textContent = h; hdr2.appendChild(c);
+  });
+  t2.appendChild(hdr2);
+
+  comboRows.forEach(row => {
+    const r = document.createElement('div'); r.className = 'alpha-row';
+    r.innerHTML = `
+      <div class="alpha-cell alpha-upper">${row.upper}</div>
+      <div class="alpha-cell alpha-lower">${row.lower}</div>
+      <div class="alpha-cell alpha-latin">${row.latin}</div>
+      <div class="alpha-cell alpha-note">${row.note}</div>
+      <div class="alpha-cell" style="padding:6px 4px">
+        <button class="alpha-speak" onclick="speak('${row.upper}',this)" title="Pronounce">🔊</button>
+      </div>
+    `;
+    t2.appendChild(r);
+  });
+  wrap.appendChild(t2);
+
+  return wrap;
+}
+
+// Build all lesson DOM
+lessons.forEach((lesson, i) => {
+  const catLessons = lessons.filter(l => l.cat === lesson.cat);
+  const pos = catLessons.indexOf(lesson) + 1;
+  const div = document.createElement('div');
+  div.className = 'lesson' + (i === 0 ? ' active' : '');
+
+  // Progress dots
+  const dots = document.createElement('div'); dots.className = 'progress-dots';
+  catLessons.forEach((_, di) => {
+    const dot = document.createElement('div');
+    dot.className = 'progress-dot' + (di < pos ? ' done' : '');
+    dots.appendChild(dot);
+  });
+  div.appendChild(dots);
+
+  // Header
+  const hd = document.createElement('div'); hd.className = 'lesson-hd';
+  hd.innerHTML = `
+    <div class="lesson-cat-tag">${cats[lesson.cat].icon} ${cats[lesson.cat].name}</div>
+    <div class="lesson-title">${lesson.title}</div>
+    <div class="lesson-sub">${lesson.subtitle}</div>
+  `;
+  div.appendChild(hd);
+
+  // Phrases
+  if (lesson.phrases && lesson.phrases.length > 0) {
+    const lbl = document.createElement('div'); lbl.className = 'section-hd'; lbl.textContent = 'Phrases';
+    div.appendChild(lbl);
+    lesson.phrases.forEach(p => div.appendChild(mkPhrase(p)));
+  }
+
+  // Vocab groups
+  if (lesson.vocabGroups) {
+    lesson.vocabGroups.forEach(vg => div.appendChild(mkVocabGroup(vg)));
+  }
+
+  // Alphabet table
+  if (lesson.alphabetTable) div.appendChild(mkAlphabetTable());
+
+  // Breakdowns
+  if (lesson.breakdowns) lesson.breakdowns.forEach(b => div.appendChild(mkBreakdown(b)));
+
+  // Form reference
+  if (lesson.formRef) div.appendChild(mkFormRef(lesson.formRef));
+
+  // Tip
+  if (lesson.tip) {
+    const tip = document.createElement('div'); tip.className = 'tip-box';
+    tip.innerHTML = '<span style="margin-right:6px">💡</span>' + lesson.tip;
+    div.appendChild(tip);
+  }
+
+  // Quiz — Greek → English
+  if (lesson.quiz) {
+    const ql = document.createElement('div'); ql.className = 'section-hd'; ql.textContent = 'Greek → English Quiz';
+    div.appendChild(ql);
+    const q = mkQuiz(i, lesson.quiz); if (q) div.appendChild(q);
+  }
+
+  // Reverse Quiz — English → Greek
+  if (lesson.quiz && lesson.quiz.length >= 3) {
+    const rql = document.createElement('div'); rql.className = 'section-hd'; rql.textContent = 'English → Greek Quiz';
+    div.appendChild(rql);
+    const rq = mkRQuiz(i, lesson.quiz); if (rq) div.appendChild(rq);
+  }
+
+  // Next button
+  const nextIdx = lessons.findIndex((l, li) => li > i && l.cat === lesson.cat);
+  if (nextIdx >= 0) {
+    const nb = document.createElement('button'); nb.className = 'next-btn';
+    nb.innerHTML = `<span>Next: ${lessons[nextIdx].title}</span><span>→</span>`;
+    nb.onclick = () => showLesson(nextIdx);
+    div.appendChild(nb);
+  }
+
+  container.appendChild(div);
+});
+
+buildLessonNav(0);
+// Pre-load voices for fallback
+window.speechSynthesis && (window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices());
+
+
+</script>
+</body>
+</html>

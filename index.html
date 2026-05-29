@@ -116,14 +116,14 @@
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body { font-family: var(--font); background: var(--grouped-bg); color: var(--label); min-height: 100vh; font-size: 17px; }
 
-  .app-header { background: var(--surface); border-bottom: 1px solid var(--separator); padding: 16px 20px 12px; position: sticky; top: 0; z-index: 100; }
+  .app-header { background: #1a1a1a; border-bottom: 1px solid rgba(255,255,255,0.08); padding: 16px 20px 12px; position: sticky; top: 0; z-index: 100; text-align: center; }
   .app-title { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; color: var(--label); }
-  .app-subtitle { font-size: 13px; color: var(--label3); margin-top: 2px; }
+  .app-subtitle { font-size: 13px; color: #999999; margin-top: 2px; }
 
-  .cat-scroll { background: var(--surface); border-bottom: 1px solid var(--separator); overflow-x: auto; display: flex; scrollbar-width: none; padding: 0 12px; }
+  .cat-scroll { background: var(--surface); border-bottom: 1px solid var(--separator); overflow-x: auto; display: flex; gap: 8px; scrollbar-width: none; padding: 10px 16px; }
   .cat-scroll::-webkit-scrollbar { display: none; }
-  .cat-btn { flex-shrink: 0; border: none; background: none; font-family: var(--font); font-size: 15px; font-weight: 500; color: var(--label3); padding: 10px 14px; cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: color 0.15s; }
-  .cat-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
+  .cat-btn { flex-shrink: 0; background: var(--surface2); border: 1.5px solid var(--separator); border-radius: 8px; font-family: var(--font); font-size: 14px; font-weight: 600; color: var(--label2); padding: 8px 14px; cursor: pointer; white-space: nowrap; transition: all 0.15s; }
+  .cat-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); box-shadow: 0 1px 4px rgba(0,122,255,0.3); }
 
   .lesson-scroll { background: var(--surface2); border-bottom: 1px solid var(--separator); overflow-x: auto; display: flex; gap: 8px; padding: 10px 16px; scrollbar-width: none; }
   .lesson-scroll::-webkit-scrollbar { display: none; }
@@ -1041,30 +1041,42 @@ const lessons = [
   title: "The Alphabet",
   subtitle: "24 letters — shapes, names, and sounds",
   phrases: [
-    { greek: "Α α", roman: "Álfa", english: "Sounds like 'a' in father" },
-    { greek: "Β β", roman: "Víta", english: "Sounds like 'v' in very — not English B" },
-    { greek: "Γ γ", roman: "Gáma", english: "Soft guttural; before e/i sounds like 'y' in yes" },
-    { greek: "Δ δ", roman: "Délta", english: "Sounds like 'th' in this (voiced) — not English D" },
-    { greek: "Ε ε", roman: "Épsilon", english: "Sounds like 'e' in bed" },
-    { greek: "Ζ ζ", roman: "Zíta", english: "Sounds like 'z' in zoo" },
-    { greek: "Η η", roman: "Íta", english: "Sounds like 'ee' in feet — same sound as ι and υ" },
-    { greek: "Θ θ", roman: "Thíta", english: "Sounds like 'th' in think (unvoiced)" },
-    { greek: "Ι ι", roman: "Ióta", english: "Sounds like 'ee' in feet" },
-    { greek: "Κ κ", roman: "Kápa", english: "Sounds like 'k' in key" },
-    { greek: "Λ λ", roman: "Lámbda", english: "Sounds like 'l' in lamp" },
-    { greek: "Μ μ", roman: "Mí", english: "Sounds like 'm' in man" },
-    { greek: "Ν ν", roman: "Ní", english: "Sounds like 'n' in net" },
-    { greek: "Ξ ξ", roman: "Ksí", english: "Sounds like 'x' in fox — ks sound, can start a word" },
-    { greek: "Ο ο", roman: "Ómikron", english: "Sounds like 'o' in hot" },
-    { greek: "Π π", roman: "Pí", english: "Sounds like 'p' in pen" },
-    { greek: "Ρ ρ", roman: "Ró", english: "A soft rolled or trilled r" },
-    { greek: "Σ σ/ς", roman: "Sígma", english: "Sounds like 's' in sun", note: "Written σ mid-word, ς at end of word" },
-    { greek: "Τ τ", roman: "Taf", english: "Sounds like 't' in top" },
-    { greek: "Υ υ", roman: "Ípsilon", english: "Sounds like 'ee' in feet — same as η and ι" },
-    { greek: "Φ φ", roman: "Fí", english: "Sounds like 'f' in five" },
-    { greek: "Χ χ", roman: "Hí", english: "Guttural — like 'ch' in Scottish loch or Bach" },
-    { greek: "Ψ ψ", roman: "Psí", english: "Sounds like 'ps' in lips — can start a word in Greek" },
-    { greek: "Ω ω", roman: "Omégha", english: "Sounds like 'o' in hot — same as ο in modern Greek" },
+    { greek: "Α α — A", roman: "Álfa", english: "Sounds like 'a' in father", audio: "άλφα" },
+    { greek: "Β β — V", roman: "Víta", english: "Sounds like 'v' in very — not English B", audio: "βήτα" },
+    { greek: "Γ γ — G", roman: "Gáma", english: "Soft guttural; before e/i sounds like 'y' in yes", audio: "γάμα" },
+    { greek: "Δ δ — D", roman: "Délta", english: "Sounds like 'th' in this (voiced) — not English D", audio: "δέλτα" },
+    { greek: "Ε ε — E", roman: "Épsilon", english: "Sounds like 'e' in bed", audio: "έψιλον" },
+    { greek: "Ζ ζ — Z", roman: "Zíta", english: "Sounds like 'z' in zoo", audio: "ζήτα" },
+    { greek: "Η η — I", roman: "Íta", english: "Sounds like 'ee' in feet — same sound as ι and υ", audio: "ήτα" },
+    { greek: "Θ θ — Th", roman: "Thíta", english: "Sounds like 'th' in think (unvoiced)", audio: "θήτα" },
+    { greek: "Ι ι — I", roman: "Ióta", english: "Sounds like 'ee' in feet", audio: "ιώτα" },
+    { greek: "Κ κ — K", roman: "Kápa", english: "Sounds like 'k' in key", audio: "κάπα" },
+    { greek: "Λ λ — L", roman: "Lámbda", english: "Sounds like 'l' in lamp", audio: "λάμβδα" },
+    { greek: "Μ μ — M", roman: "Mí", english: "Sounds like 'm' in man", audio: "μι" },
+    { greek: "Ν ν — N", roman: "Ní", english: "Sounds like 'n' in net", audio: "νι" },
+    { greek: "Ξ ξ — X", roman: "Ksí", english: "Sounds like 'x' in fox — always ks, never gz", audio: "ξι" },
+    { greek: "Ο ο — O", roman: "Ómikron", english: "Sounds like 'o' in hot", audio: "όμικρον" },
+    { greek: "Π π — P", roman: "Pí", english: "Sounds like 'p' in pen", audio: "πι" },
+    { greek: "Ρ ρ — R", roman: "Ró", english: "A soft rolled or trilled r", audio: "ρο" },
+    { greek: "Σ σ/ς — S", roman: "Sígma", english: "Sounds like 's' in sun", note: "Written σ mid-word, ς at end of word", audio: "σίγμα" },
+    { greek: "Τ τ — T", roman: "Taf", english: "Sounds like 't' in top", audio: "ταυ" },
+    { greek: "Υ υ — Y", roman: "Ípsilon", english: "Sounds like 'ee' in feet — same as η and ι", audio: "ύψιλον" },
+    { greek: "Φ φ — F", roman: "Fí", english: "Sounds like 'f' in five", audio: "φι" },
+    { greek: "Χ χ — H", roman: "Hí", english: "Guttural — like 'ch' in Scottish loch or Bach", audio: "χι" },
+    { greek: "Ψ ψ — Ps", roman: "Psí", english: "Sounds like 'ps' in lips — can start a word in Greek", audio: "ψι" },
+    { greek: "Ω ω — O", roman: "Omégha", english: "Sounds like 'o' in hot — same as ο in modern Greek", audio: "ωμέγα" },
+  ],
+  diphthongs: [
+    { greek: "αι — E",  roman: "e — like 'e' in bed",       english: "e.g. καλαμάρι (calamari)",      audio: "καλαμάρι" },
+    { greek: "ει — I",  roman: "i — like 'ee' in feet",     english: "e.g. είναι (is / are)",         audio: "είναι" },
+    { greek: "οι — I",  roman: "i — like 'ee' in feet",     english: "e.g. ποιος (who)",              audio: "ποιος" },
+    { greek: "ου — U",  roman: "u — like 'oo' in moon",     english: "e.g. ουρανός (sky / heaven)",  audio: "ουρανός" },
+    { greek: "αυ — Av/Af", roman: "av before vowels & voiced consonants, af before voiceless", english: "e.g. αυτό (this)", audio: "αυτό" },
+    { greek: "μπ — B",  roman: "b — like 'b' in beer",      english: "e.g. μπύρα (beer)",            audio: "μπύρα" },
+    { greek: "ντ — D",  roman: "d — like 'd' in door",      english: "e.g. ντομάτα (tomato)",        audio: "ντομάτα" },
+    { greek: "γκ — G",  roman: "g — like 'g' in go",        english: "e.g. αγκαλιά (embrace / hug)", audio: "αγκαλιά" },
+    { greek: "τσ — Ts", roman: "ts — like 'ts' in cats",    english: "e.g. τσάι (tea)",              audio: "τσάι" },
+    { greek: "τζ — Dz", roman: "dz — like 'ds' in suds",    english: "e.g. τζατζίκι (tzatziki)",    audio: "τζατζίκι" },
   ],
   tip: "Three letters that trip up English speakers: <strong>Β</strong> is a V sound (not B), <strong>Δ</strong> is the TH in 'this' (not D), and <strong>Χ</strong> is a guttural H (not CH). Also: η, ι, and υ all sound like 'ee' in modern Greek.",
 },
@@ -1345,7 +1357,7 @@ function mkPhrase(p) {
       <div class="phrase-english">${p.english}</div>
       ${p.note ? `<div class="phrase-note">${p.note}</div>` : ''}
     </div>
-    <button class="speak-btn" onclick="speak('${safe(p.greek)}',this)">🔊</button>
+    <button class="speak-btn" onclick="speak('${safe(p.audio||p.greek)}',this)">🔊</button>
   `;
   return d;
 }
@@ -1433,15 +1445,21 @@ function renderQuiz(card, li, qd) {
 }
 
 function answerQ(li, qd, chosen, correct) {
-  const s = quizState[li]; if (s.answered) return; s.answered = true;
+  const s = quizState[li]; if (s.answered) return;
+  speak(chosen, null);
+  if (chosen !== correct) {
+    document.querySelectorAll(`#qo-${li} .quiz-opt`).forEach(b => {
+      if (b.textContent === chosen) b.classList.add('wrong');
+    });
+    return;
+  }
+  s.answered = true;
   const fb = document.getElementById(`qf-${li}`); const nn = document.getElementById(`qn-${li}`);
   document.querySelectorAll(`#qo-${li} .quiz-opt`).forEach(b => {
     b.disabled = true;
     if (b.textContent === correct) b.classList.add('correct');
-    else if (b.textContent === chosen) b.classList.add('wrong');
   });
-  if (chosen === correct) { s.score++; fb.textContent = '✓ Correct!'; fb.style.color = 'var(--green)'; }
-  else { fb.textContent = `✗ Answer: ${correct}`; fb.style.color = 'var(--red)'; }
+  s.score++; fb.textContent = '✓ Correct!'; fb.style.color = 'var(--green)';
   if (nn) nn.style.display = 'inline-block';
 }
 
@@ -1522,16 +1540,22 @@ function renderRQuiz(card, li) {
 }
 
 function answerRQ(li, chosen, correct) {
-  const s = rquizState[li]; if (s.answered) return; s.answered = true;
+  const s = rquizState[li]; if (s.answered) return;
+  speak(chosen, null);
+  if (chosen !== correct) {
+    document.querySelectorAll(`#rqo-${li} .quiz-opt`).forEach(b => {
+      if (b.textContent === chosen) b.classList.add('wrong');
+    });
+    return;
+  }
+  s.answered = true;
   const fb = document.getElementById(`rqf-${li}`);
   const nn = document.getElementById(`rqn-${li}`);
   document.querySelectorAll(`#rqo-${li} .quiz-opt`).forEach(b => {
     b.disabled = true;
     if (b.textContent === correct) b.classList.add('correct');
-    else if (b.textContent === chosen) b.classList.add('wrong');
   });
-  if (chosen === correct) { s.score++; fb.textContent = '✓ Correct!'; fb.style.color = 'var(--green)'; }
-  else { fb.textContent = `✗ Answer: ${correct}`; fb.style.color = 'var(--red)'; }
+  s.score++; fb.textContent = '✓ Correct!'; fb.style.color = 'var(--green)';
   if (nn) nn.style.display = 'inline-block';
 }
 
@@ -1594,6 +1618,13 @@ lessons.forEach((lesson, i) => {
     lesson.phrases.forEach(p => div.appendChild(mkPhrase(p)));
   }
 
+  // Diphthongs (second phrases section, used in Alphabet lesson)
+  if (lesson.diphthongs) {
+    const lbl2 = document.createElement('div'); lbl2.className = 'section-hd'; lbl2.textContent = 'Diphthongs & combinations';
+    div.appendChild(lbl2);
+    lesson.diphthongs.forEach(p => div.appendChild(mkPhrase(p)));
+  }
+
   // Vocab groups
   if (lesson.vocabGroups) {
     lesson.vocabGroups.forEach(vg => div.appendChild(mkVocabGroup(vg)));
@@ -1614,15 +1645,11 @@ lessons.forEach((lesson, i) => {
 
   // Quiz — Greek → English
   if (lesson.quiz) {
-    const ql = document.createElement('div'); ql.className = 'section-hd'; ql.textContent = 'Greek → English Quiz';
-    div.appendChild(ql);
     const q = mkQuiz(i, lesson.quiz); if (q) div.appendChild(q);
   }
 
   // Reverse Quiz — English → Greek
   if (lesson.quiz && lesson.quiz.length >= 3) {
-    const rql = document.createElement('div'); rql.className = 'section-hd'; rql.textContent = 'English → Greek Quiz';
-    div.appendChild(rql);
     const rq = mkRQuiz(i, lesson.quiz); if (rq) div.appendChild(rq);
   }
 

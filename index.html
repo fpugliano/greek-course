@@ -17,7 +17,7 @@
 <meta name="application-name" content="Καλημέρα">
 
 <!-- Makes it open full-screen (no Safari chrome) -->
-<meta name="-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
@@ -67,14 +67,13 @@
     // ── White cross inside the canton ──
     // Cross thickness = 1 stripe height
     const crossW  = stripeH;           // thickness of cross arms
-    const crossCX = cantonSize / 2;    // centre of canton
-    const crossCY = cantonSize / 2;
+    const crossC = cantonSize / 2; // centre of canton
 
     ctx.fillStyle = white;
     // Horizontal arm
-    ctx.fillRect(0, crossCY - crossW / 2, cantonSize, crossW);
+    ctx.fillRect(0, crossC - crossW / 2, cantonSize, crossW);
     // Vertical arm
-    ctx.fillRect(crossCX - crossW / 2, 0, crossW, cantonSize);
+    ctx.fillRect(crossC - crossW / 2, 0, crossW, cantonSize);
 
     return c.toDataURL('image/png');
   }
@@ -85,16 +84,16 @@
     const fav = document.getElementById('favIcon');
     if (el) el.href = iconData;
     if (fav) { fav.href = iconData; fav.type = 'image/png'; }
+    const logo = document.getElementById('headerLogo');
+    if (logo) logo.src = OROBORO_LOGO;
   });
 })();
 </script>
 <style>
   :root {
-    --bg: #f2f2f7;
     --surface: #ffffff;
     --surface2: #f2f2f7;
     --blue: #007aff;
-    --blue-dark: #0051a8;
     --label: #000000;
     --label2: #3c3c43cc;
     --label3: #3c3c4399;
@@ -108,7 +107,7 @@
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #000000; --surface: #1c1c1e; --surface2: #2c2c2e;
+      --surface: #1c1c1e; --surface2: #2c2c2e;
       --label: #ffffff; --label2: #ebebf5cc; --label3: #ebebf599;
       --separator: #38383a; --grouped-bg: #000000;
     }
@@ -117,7 +116,6 @@
   body { font-family: var(--font); background: var(--grouped-bg); color: var(--label); min-height: 100vh; font-size: 17px; }
 
   .app-header { background: #1a1a1a; border-bottom: 1px solid rgba(255,255,255,0.08); padding: 16px 20px 12px; position: sticky; top: 0; z-index: 100; text-align: center; }
-  .app-title { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; color: var(--label); }
   .app-subtitle { font-size: 13px; color: #999999; margin-top: 2px; }
 
   .cat-scroll { background: var(--surface); border-bottom: 1px solid var(--separator); overflow-x: auto; display: flex; gap: 8px; scrollbar-width: none; padding: 10px 16px; }
@@ -219,7 +217,6 @@
 
 <div class="app-header">
   <img id="headerLogo" alt="Oroboro" style="height:38px;width:auto;object-fit:contain;">
-  <script>document.getElementById('headerLogo').src=OROBORO_LOGO;</script>
   <div class="app-subtitle">Greek For Sailors</div>
 </div>
 <div class="cat-scroll" id="catNav"></div>
@@ -358,7 +355,7 @@ const lessons = [
 {
   cat: 0, title: "At a Restaurant", subtitle: "Order meals and navigate the menu",
   phrases: [
-    { greek: "Θέλω να παραγγείλω", roman: "Thélo na paragilо", english: "I would like to order" },
+    { greek: "Θέλω να παραγγείλω", roman: "Thélo na paragilo", english: "I would like to order" },
     { greek: "Τι έχετε σήμερα;", roman: "Ti éhete símera?", english: "What do you have today?" },
     { greek: "Θέλω ένα σουβλάκι", roman: "Thélo éna souvláki", english: "I want a souvlaki" },
     { greek: "Θέλω μία μερίδα χταπόδι", roman: "Thélo mía merída htapódi", english: "I want a portion of octopus" },
@@ -419,7 +416,7 @@ const lessons = [
         { greek: "η εκκλησία", roman: "i eklisía", english: "the church" },
         { greek: "η πλατεία", roman: "i platía", english: "the town square" },
         { greek: "η παραλία", roman: "i paralía", english: "the beach" },
-        { greek: "το εστιατόριο", roman: "to estiатório", english: "the restaurant" },
+        { greek: "το εστιατόριο", roman: "to estiatório", english: "the restaurant" },
         { greek: "το καφενείο", roman: "to kafenío", english: "the café / coffee shop" },
         { greek: "το ξενοδοχείο", roman: "to xenodohío", english: "the hotel" },
         { greek: "η τουαλέτα", roman: "i tualéta", english: "the toilet / WC" },
@@ -430,7 +427,7 @@ const lessons = [
         { greek: "το ψαράδικο", roman: "to psarádiko", english: "the fish market / fishmonger" },
         { greek: "το περίπτερο", roman: "to períptero", english: "the kiosk (newspaper / snacks)" },
         { greek: "ο ψαράς", roman: "o psarás", english: "the fisherman" },
-        { greek: "ο ναυαγοσώστης", roman: "o navagoсóstis", english: "the lifeguard" },
+        { greek: "ο ναυαγοσώστης", roman: "o navagocóstis", english: "the lifeguard" },
         { greek: "το surf shop", roman: "to surf shop", english: "the surf / kite shop" },
       ]
     }
@@ -568,7 +565,7 @@ const lessons = [
       { en: "Home port", greek: "Λιμένας νηολόγησης", roman: "Liménas niolóyisis" },
       { en: "Port of entry", greek: "Λιμένας εισόδου", roman: "Liménas isóðu" },
       { en: "Date of arrival", greek: "Ημερομηνία άφιξης", roman: "Imerominía áfixis" },
-      { en: "Owner / skipper", greek: "Πλοιοκτήτης / Κυβερνήτης", roman: "Ploioktiтis / Kivernítis" },
+      { en: "Owner / skipper", greek: "Πλοιοκτήτης / Κυβερνήτης", roman: "Ploioktitis / Kivernítis" },
       { en: "Owner's country", greek: "Χώρα κατοικίας", roman: "Hóra katikías" },
       { en: "Insurance document", greek: "Ασφαλιστήριο σκάφους", roman: "Asfalistírio skáfus" },
       { en: "Fuel on board (lt)", greek: "Καύσιμα επί σκάφους", roman: "Káfsima epí skáfus" },
@@ -676,7 +673,7 @@ const lessons = [
     { greek: "Το bar είναι χαλασμένο", roman: "To bar íne halazméno", english: "The bar is broken" },
     { greek: "Έχω κολλήσει τον αετό", roman: "Ého kolísi ton aetó", english: "My kite is stuck (in the water / in the air)" },
     { greek: "Χρειάζομαι βοήθεια στη θάλασσα", roman: "Hriaázome voíthia sti thálasa", english: "I need help in the water" },
-    { greek: "Πού είναι ο ναυαγοσώστης;", roman: "Pu íne o navagoсóstis?", english: "Where is the lifeguard?" },
+    { greek: "Πού είναι ο ναυαγοσώστης;", roman: "Pu íne o navagocóstis?", english: "Where is the lifeguard?" },
     { greek: "Φοράς σωσίβιο;", roman: "Forás sosívio?", english: "Are you wearing a buoyancy aid?" },
     { greek: "Πού μπορώ να ενοικιάσω εξοπλισμό;", roman: "Pu boró na enikáso exoplizmó?", english: "Where can I rent equipment?" },
     { greek: "Πού είναι το kite school;", roman: "Pu íne to kite school?", english: "Where is the kite school?" },
@@ -709,7 +706,7 @@ const lessons = [
     { greek: "Είναι εύκολο να μάθεις;", roman: "Íne éfkolo na máthis?", english: "Is it easy to learn?" },
     { greek: "Πόσο διαρκεί να μάθεις;", roman: "Póso diarkí na máthis?", english: "How long does it take to learn?" },
     { greek: "Έχω μάθει μόνος μου", roman: "Ého máthei mónos mu", english: "I taught myself" },
-    { greek: "Πήρα μαθήματα από εκπαιδευτή", roman: "Píra mathímata apó ekpedefтí", english: "I took lessons from an instructor" },
+    { greek: "Πήρα μαθήματα από εκπαιδευτή", roman: "Píra mathímata apó ekpedefti", english: "I took lessons from an instructor" },
     { greek: "Τρώω νερό συνέχεια!", roman: "Tróo neró sinéhia!", english: "I keep crashing / eating water!", note: "Literally 'I keep eating water' — a very natural expression" },
     { greek: "Επιτέλους σηκώθηκα!", roman: "Epitélus sikóthika!", english: "I finally got up on foil!" },
   ],
@@ -1479,6 +1476,8 @@ function speakFallback(text, btn) {
     utt.onerror = () => setButtonState(btn, 'idle');
   }
   window.speechSynthesis.speak(utt);
+  const notice = document.getElementById('ttsNotice');
+  if (notice) notice.style.display = 'none';
 }
 
 function safe(str) { return (str||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }

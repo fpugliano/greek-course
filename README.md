@@ -4,6 +4,7 @@ A free, offline-capable phrasebook Progressive Web App (PWA) for sailors,
 kite surfers, wing foilers, and anyone spending time on or near the water in Greece.
 
 **Live app → [greek.sailingoroboro.com](https://greek.sailingoroboro.com)**
+![Greek for Sailors](screenshot.PNG)
 
 ---
 

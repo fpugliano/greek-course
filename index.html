@@ -1454,16 +1454,31 @@ async function speak(text, btn) {
   }
 }
 
+function isGreekText(text) {
+  return /[Ͱ-Ͽ]/.test(text);
+}
+
 // Browser TTS fallback (used if Worker not configured or fails)
 function speakFallback(text, btn) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   const utt = new SpeechSynthesisUtterance(text);
-  utt.lang = 'el-GR';
   utt.rate = 0.82;
   const voices = window.speechSynthesis.getVoices();
-  const greek = voices.find(v => v.lang && v.lang.startsWith('el'));
-  if (greek) utt.voice = greek;
+  if (isGreekText(text)) {
+    utt.lang = 'el-GR';
+    const greek = voices.find(v => v.lang && v.lang.startsWith('el'));
+    if (greek) utt.voice = greek;
+  } else {
+    utt.lang = 'en-US';
+    const en =
+      voices.find(v => v.name.includes('Samantha')) ||
+      voices.find(v => v.name.includes('Ava')) ||
+      voices.find(v => v.name.includes('Siri')) ||
+      voices.find(v => v.lang === 'en-US' && v.localService === true) ||
+      voices.find(v => v.lang && v.lang.startsWith('en'));
+    if (en) utt.voice = en;
+  }
   if (btn) {
     setButtonState(btn, 'playing');
     utt.onend = () => setButtonState(btn, 'idle');
